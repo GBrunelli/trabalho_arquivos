@@ -16,6 +16,7 @@ struct _CarHeader {
 };
 
 struct _Car {
+    // at least 36 bytes
     int8_t removido;
     int32_t tamanhoRegistro;
     char prefixo[5];
@@ -76,14 +77,19 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     // get each column
     char *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descrevePrefixo);
+
     *token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveData);
+    sscanf(token, "%d", carHeader->descreveData);           
+
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveLugares);
+
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveLinha);
+
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveModelo);
+
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveCategoria);
 
@@ -104,7 +110,10 @@ void overwriteCarHeader(CarHeader ch, FILE* file)
 // Creates a new reusable Car.
 Car* newCar()
 {
-
+    Car* car = calloc(1, sizeof(Car));
+    car->removido = 1;
+    car->tamanhoRegistro = 36;
+    return car;
 }
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
