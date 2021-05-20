@@ -2,6 +2,7 @@
 #include "routines.h"
 
 struct _CarHeader {
+    // 175 bytes
     int8_t status;
     int64_t byteProxReg;
     int32_t nroRegistros;
@@ -52,11 +53,43 @@ CarHeader* _getCarHeaderFromBin(FILE* file)
 
 }
 
+/**
+ * NEED TO TEST 
+ * */
 // Generates a CarHeader from a valid CSV file. 
 // Must be first command used on CSV File or will not work.
 CarHeader* _getCarHeaderFromCSV(FILE* file)
 {
+    CarHeader* carHeader = malloc(sizeof(CarHeader));
+    carHeader->status = 0;
+    carHeader->byteProxReg = 175;
+    carHeader->nroRegistros = 0;
+    carHeader->nroRegistrosRemovidos = 0;
+    
+    fseek(file, 0, SEEK_SET);
 
+    // read the line
+    char *buffer = calloc(1, MAX_STRING_SIZE);
+    char *buffer_pointer = buffer; // save the initial pointer location to free later
+    fscanf(file, "%s", buffer);
+
+    // get each column
+    char *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descrevePrefixo);
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descreveData);
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descreveLugares);
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descreveLinha);
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descreveModelo);
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", carHeader->descreveCategoria);
+
+    free(buffer_pointer);
+
+    return carHeader;
 }
 
 // Overwrite old CarHeader from file with a newer, currently in-memory one.
