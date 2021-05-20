@@ -20,8 +20,12 @@ void overwriteCarHeader(CarHeader ch, FILE* file);
 
 /* ## Basic Car functions ## */
 
+
 // Creates a new reusable Car.
 Car* newCar();
+
+// Reads a car from a source file.
+Car* readCar(Car *c, FILE* file, Source From);
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 void printCar(Car* c);

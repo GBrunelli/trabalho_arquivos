@@ -1,5 +1,6 @@
 #include "project.h"
 #include "routines.h"
+#include <string.h>
 
 struct _CarHeader {
     // 175 bytes
@@ -37,14 +38,14 @@ CarHeader* getCarHeader(FILE* file, Source from)
 {
     switch (from)
     {
-    case CSV:
-        return _getCarHeaderFromCSV(file);
+        case CSV:
+            return _getCarHeaderFromCSV(file);
+        
+        case BIN:
+            return _getCarHeaderFromBin(file);
     
-    case BIN:
-        return _getCarHeaderFromBin(file);
-
-    default:
-        return NULL;
+        default:
+            return NULL;
     }
 }
 
@@ -76,16 +77,16 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
 
     // get each column
     char *token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descrevePrefixo);
+    sscanf(token, "%s", carHeader->descrevePrefixo);
 
     *token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveData);           
+    sscanf(token, "%s", carHeader->descreveData);           
 
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveLugares);
 
     *token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveLinha);
+    sscanf(token, "%s", carHeader->descreveLinha);
 
     *token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveModelo);
@@ -113,6 +114,77 @@ Car* newCar()
     Car* car = calloc(1, sizeof(Car));
     car->removido = 1;
     car->tamanhoRegistro = 36;
+    return car;
+}
+
+// Shifts a string to left.
+void leftShift(char *string, int len)
+{
+    int i;
+    for(i = 1; i < len; i++)
+    {
+        string[i - 1] = string[i];
+    }
+    string[len -1] = '/0';
+}
+
+// Reads a car from a source file.
+Car* readCar(Car* car, FILE* file, Source from)
+{
+    switch (from)
+    {
+        case CSV:
+            _readCarFromCSV(car, file);
+            break;
+
+        default:
+            break;
+    }
+}
+
+Car* _readCarFromCSV(Car *car, FILE *file)
+{
+    // read the line
+    char *buffer = calloc(1, MAX_STRING_SIZE);
+    char *buffer_pointer = buffer; // save the initial pointer location to free later
+    fscanf(file, "%s", buffer);
+
+    // get each column
+    char *token = strsep(&buffer, ",");
+    sscanf(token, "%s", car->prefixo);
+
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%s", car->data);     
+
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%d", car->quantidadeLugares);
+
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%s", car->codLinha);
+
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%s", car->modelo);
+
+    *token = strsep(&buffer, ",");
+    sscanf(token, "%s", car->categoria);          
+
+    // verify if the register is removed
+    if(car->prefixo[0] = "*")
+    {
+        car->removido = 0;
+        leftShift(car->prefixo, 5);
+    }
+
+    // calculates the lenght of car->modelo and car->categoria
+    int lenghtModelo = strlen(car->modelo);
+    int lenghtCategoria = strlen(car->categoria);
+    car->tamanhoModelo = lenghtModelo;
+    car->tamanhoCategoria = lenghtCategoria;
+
+    // calculates the size of the register
+    car->tamanhoRegistro += lenghtModelo + lenghtCategoria;
+
+    free(buffer_pointer);
     return car;
 }
 
