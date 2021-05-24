@@ -66,16 +66,16 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     sscanf(token, "%s", carHeader->descreveData);           
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveLugares);
+    sscanf(token, "%s", carHeader->descreveLugares);
 
     token = strsep(&buffer, ",");
     sscanf(token, "%s", carHeader->descreveLinha);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveModelo);
+    sscanf(token, "%s", carHeader->descreveModelo);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%d", carHeader->descreveCategoria);
+    sscanf(token, "%s", carHeader->descreveCategoria);
 
     free(buffer_pointer);
 
