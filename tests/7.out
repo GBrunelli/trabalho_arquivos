@@ -139,12 +139,12 @@ Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
 
 Codigo da linha: 280
-Nome da linha: campo com valor nulo
+Nome da linha: NSA.SRA.DE NAZARE
 Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
 Codigo da linha: 360
-Nome da linha: campo com valor nulo
+Nome da linha: NOVENA
 Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
@@ -319,7 +319,7 @@ Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
 Codigo da linha: 666
-Nome da linha: campo com valor nulo
+Nome da linha: NOVO MUNDO
 Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
@@ -339,7 +339,7 @@ Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
 Codigo da linha: 674
-Nome da linha: campo com valor nulo
+Nome da linha: NSA. SRA. DA LUZ
 Cor que descreve a linha: AMARELA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
@@ -629,7 +629,7 @@ Cor que descreve a linha: LARANJA
 Aceita cartao: PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR
 
 Codigo da linha: 521
-Nome da linha: campo com valor nulo
+Nome da linha: NIVALDO BRAGA
 Cor que descreve a linha: LARANJA
 Aceita cartao: PAGAMENTO EM CARTAO E DINHEIRO
 
