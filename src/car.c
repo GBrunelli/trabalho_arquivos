@@ -51,12 +51,13 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     carHeader->nroRegistros = 0;
     carHeader->nroRegistrosRemovidos = 0;
     
+    // set the pointer to the start of the file
     fseek(file, 0, SEEK_SET);
 
     // read the line
-    char *buffer = calloc(1, MAX_STRING_SIZE);
+    char *buffer = calloc(1, 256);
     char *buffer_pointer = buffer; // save the initial pointer location to free later
-    fscanf(file, "%[^\n]", buffer);
+    fscanf(file, "%[^\n]%*c", buffer);
 
     // get each column
     char* token = strsep(&buffer, ",");
@@ -77,7 +78,7 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     token = strsep(&buffer, ",");
     strcpy(carHeader->descreveCategoria, token);
 
-    free(buffer_pointer);
+    free(buffer_pointer);  
 
     return carHeader;
 }
@@ -131,45 +132,49 @@ void leftShift(char *string, int len)
 
 Car* _readCarFromCSV(Car *car, FILE *file)
 {
+    car = NULL;
     // read the line
-    char *buffer = calloc(1, MAX_STRING_SIZE);
+    char *buffer = calloc(1, 256);
     char *buffer_pointer = buffer; // save the initial pointer location to free later
-    fscanf(file, "%s", buffer);
+    fscanf(file, "%[^\n]%*c", buffer);
 
-    // get each column
-    char *token = strsep(&buffer, ",");
-    sscanf(token, "%s", car->prefixo);
-
-    token = strsep(&buffer, ",");
-    sscanf(token, "%s", car->data);     
-
-    token = strsep(&buffer, ",");
-    sscanf(token, "%d", &car->quantidadeLugares);
-
-    token = strsep(&buffer, ",");
-    sscanf(token, "%d", &car->codLinha);
-
-    token = strsep(&buffer, ",");
-    sscanf(token, "%s", car->modelo);
-
-    token = strsep(&buffer, ",");
-    sscanf(token, "%s", car->categoria);          
-
-    // verify if the register is removed
-    if(car->prefixo[0] == '*')
+    if(strlen(buffer) > 0)
     {
-        car->removido = 0;
-        leftShift(car->prefixo, 5);
+        // get each column
+        char *token = strsep(&buffer, ",");
+        strcpy(car->prefixo, token);
+
+        token = strsep(&buffer, ",");
+        strcpy(car->data, token);     
+
+        token = strsep(&buffer, ",");
+        sscanf(token, "%d", &car->quantidadeLugares);
+
+        token = strsep(&buffer, ",");
+        sscanf(token, "%d", &car->codLinha);
+
+        token = strsep(&buffer, ",");
+        strcpy(car->modelo, token);
+
+        token = strsep(&buffer, ",");
+        strcpy(car->categoria, token);          
+
+        // verify if the register is removed
+        if(car->prefixo[0] == '*')
+        {
+            car->removido = 0;
+            leftShift(car->prefixo, 5);
+        }
+
+        // calculates the lenght of car->modelo and car->categoria
+        int lenghtModelo = strlen(car->modelo);
+        int lenghtCategoria = strlen(car->categoria);
+        car->tamanhoModelo = lenghtModelo;
+        car->tamanhoCategoria = lenghtCategoria;
+
+        // calculates the size of the register
+        car->tamanhoRegistro += lenghtModelo + lenghtCategoria;
     }
-
-    // calculates the lenght of car->modelo and car->categoria
-    int lenghtModelo = strlen(car->modelo);
-    int lenghtCategoria = strlen(car->categoria);
-    car->tamanhoModelo = lenghtModelo;
-    car->tamanhoCategoria = lenghtCategoria;
-
-    // calculates the size of the register
-    car->tamanhoRegistro += lenghtModelo + lenghtCategoria;
 
     free(buffer_pointer);
     return car;
@@ -204,7 +209,7 @@ void freeCar(Car* c)
 // Free all memory associated with a CarHeader
 void freeCarHeader(CarHeader* carHeader)
 {
-
+    free(carHeader);
 }
 
 
