@@ -155,7 +155,7 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     sscanf(token, "%s", car->categoria);          
 
     // verify if the register is removed
-    if(car->prefixo[0] = "*")
+    if(car->prefixo[0] == '*')
     {
         car->removido = 0;
         leftShift(car->prefixo, 5);
