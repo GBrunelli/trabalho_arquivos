@@ -18,11 +18,7 @@ CarHeader* newCarHeader();
 // Currently supported sources: BIN, CSV
 CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from);
 
-// Overwrite old CarHeader from file with a newer, currently in-memory one.
-void overwriteCarHeader(CarHeader ch, FILE* file);
-
 /* ## Basic Car functions ## */
-
 
 // Creates a new reusable Car.
 Car* newCar();
