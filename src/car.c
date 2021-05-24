@@ -35,7 +35,7 @@ struct _Car {
 // Generates a CarHeader from a valid binary file. 
 CarHeader* _getCarHeaderFromBin(FILE* file)
 {
-
+    return NULL;
 }
 
 /**
@@ -95,8 +95,9 @@ CarHeader* getCarHeader(FILE* file, Source from)
             return _getCarHeaderFromBin(file);
     
         default:
-            return NULL;
+            break;
     }
+    return NULL;
 }
 
 // Overwrite old CarHeader from file with a newer, currently in-memory one.
@@ -185,6 +186,7 @@ Car* readCar(Car* car, FILE* file, Source from)
         default:
             break;
     }
+    return NULL;
 }
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
@@ -317,11 +319,11 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 // Returns CarField representation of struct field found 
 CarField* getCarField(CarHeader ch, char* providedField)
 {
-
+    return NULL;
 }
 
 // Returns true if a Car's field == searched value
 bool checkCarByField(Car* c, CarField field, char* value)
 {
-
+    return NULL;
 }
