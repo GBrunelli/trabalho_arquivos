@@ -125,7 +125,7 @@ void leftShift(char *string, int len)
     {
         string[i - 1] = string[i];
     }
-    string[len -1] = "\0";
+    string[len - 1] = 0;
 }
 
 Car* _readCarFromCSV(Car *car, FILE *file)
@@ -139,19 +139,19 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     char *token = strsep(&buffer, ",");
     sscanf(token, "%s", car->prefixo);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", car->data);     
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%d", car->quantidadeLugares);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", car->codLinha);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", car->modelo);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", car->categoria);          
 
     // verify if the register is removed
