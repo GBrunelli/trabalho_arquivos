@@ -56,26 +56,26 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     // read the line
     char *buffer = calloc(1, MAX_STRING_SIZE);
     char *buffer_pointer = buffer; // save the initial pointer location to free later
-    fscanf(file, "%s", buffer);
+    fscanf(file, "%[^\n]", buffer);
 
     // get each column
     char* token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descrevePrefixo);
+    sscanf(token, "%[^\n]%*c", carHeader->descrevePrefixo);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descreveData);           
+    sscanf(token, "%[^\n]%*c", carHeader->descreveData);           
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descreveLugares);
+    sscanf(token, "%[^\n]%*c", carHeader->descreveLugares);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descreveLinha);
+    sscanf(token, "%[^\n]%*c", carHeader->descreveLinha);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descreveModelo);
+    sscanf(token, "%[^\n]%*c", carHeader->descreveModelo);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", carHeader->descreveCategoria);
+    sscanf(token, "%[^\n]%*c", carHeader->descreveCategoria);
 
     free(buffer_pointer);
 
@@ -304,7 +304,7 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 {
     switch (from)
     {
-        case CSV:
+        case BIN:
             _writeCarHeaderToBin(carHeader, file);
             break;
 
