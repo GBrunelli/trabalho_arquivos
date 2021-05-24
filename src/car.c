@@ -2,9 +2,11 @@
 #include "routines.h"
 #include <string.h>
 
+#define STRUCT_CAR_HEADER_SIZE 175
+#define STRUCT_BASE_CAR_SIZE 31
+
 struct _CarHeader {
-    // 175 bytes
-    int8_t status;
+    char status;
     int64_t byteProxReg;
     int32_t nroRegistros;
     int32_t nroRegistrosRemovidos;
@@ -17,8 +19,7 @@ struct _CarHeader {
 };
 
 struct _Car {
-    // at least 36 bytes
-    int8_t removido;
+    char removido;
     int32_t tamanhoRegistro;
     char prefixo[5];
     char data[10];
@@ -36,7 +37,7 @@ struct _Car {
 CarHeader* newCarHeader()
 {
     CarHeader* carHeader = calloc(1, sizeof(CarHeader));
-    carHeader->byteProxReg = 175;
+    carHeader->byteProxReg = STRUCT_CAR_HEADER_SIZE;
     return carHeader;
 }
 
@@ -126,7 +127,8 @@ void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
     fwrite(&carHeader->descreveData,            sizeof(carHeader->descreveData),            1, file);
     fwrite(&carHeader->descreveLugares,         sizeof(carHeader->descreveLugares),         1, file);
     fwrite(&carHeader->descreveLinha,           sizeof(carHeader->descreveLinha),           1, file);
-    fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveModelo),          1, file);    
+    fwrite(&carHeader->descreveModelo,          sizeof(carHeader->descreveModelo),          1, file);
+    fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveCategoria),       1, file);    
 }
 
 // Writes a CarHeader to a specific source
@@ -150,8 +152,8 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 Car* newCar()
 {
     Car* car = malloc(sizeof(struct _Car));
-    car->removido = 1;
-    car->tamanhoRegistro = 36;
+    car->removido = '1';
+    car->tamanhoRegistro = STRUCT_BASE_CAR_SIZE;
     return car;
 }
 
@@ -164,6 +166,24 @@ void leftShift(char *string, int len)
         string[i - 1] = string[i];
     }
     string[len - 1] = 0;
+}
+
+int isNULO(char* string)
+{
+    if(!strcmp(string, "NULO"))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+void fillWithGarbage(char* string, int len)
+{
+    string[0] = 0;
+    for (int i = 1; i < len; i++)
+    {
+        string[i] = '@';
+    }
 }
 
 Car* _readCarFromCSV(Car *car, FILE *file)
@@ -182,27 +202,49 @@ Car* _readCarFromCSV(Car *car, FILE *file)
         char *token = strsep(&buffer, ",");
         strcpy(car->prefixo, token);
 
+        // DATA
         token = strsep(&buffer, ",");
-        strcpy(car->data, token);     
+        if(isNULO(token))
+            fillWithGarbage(car->data, sizeof(car->data));
+        else
+            strcpy(car->data, token);     
+        
+        // QUANTIDADE DE LUGARES
+        token = strsep(&buffer, ",");
+        if(isNULO(token))
+            car->quantidadeLugares = -1;
+        else
+            sscanf(token, "%d", &car->quantidadeLugares);
 
+        // COD LINHA
         token = strsep(&buffer, ",");
-        sscanf(token, "%d", &car->quantidadeLugares);
+        if(isNULO(token))
+            car->codLinha = -1;
+        else
+            sscanf(token, "%d", &car->codLinha);
 
+        // MODELO
         token = strsep(&buffer, ",");
-        sscanf(token, "%d", &car->codLinha);
+        if(isNULO(token))
+            fillWithGarbage(car->modelo, sizeof(car->modelo));
+        else
+            strcpy(car->modelo, token);    
 
+        // CATEGORIA
         token = strsep(&buffer, ",");
-        strcpy(car->modelo, token);
-
-        token = strsep(&buffer, ",");
-        strcpy(car->categoria, token);          
+        if(isNULO(token))
+            fillWithGarbage(car->categoria, sizeof(car->categoria));
+        else
+            strcpy(car->categoria, token);         
 
         // verify if the register is removed
         if(car->prefixo[0] == '*')
         {
-            car->removido = 0;
+            car->removido = '0';
             leftShift(car->prefixo, 5);
         }
+        else 
+            car->removido = '1';
 
         // calculates the lenght of car->modelo and car->categoria
         int lenghtModelo = strlen(car->modelo);
@@ -211,7 +253,7 @@ Car* _readCarFromCSV(Car *car, FILE *file)
         car->tamanhoCategoria = lenghtCategoria;
 
         // calculates the size of the register
-        car->tamanhoRegistro += lenghtModelo + lenghtCategoria;
+        car->tamanhoRegistro = STRUCT_BASE_CAR_SIZE + lenghtModelo + lenghtCategoria;
     }
     else
     {
@@ -292,10 +334,20 @@ void _writeCarToBin(Car* car, FILE* file)
     // gets the information from the header and update it
     CarHeader* header = newCarHeader();
     getCarHeader(header, file, BIN);
-    header->status = 0;
+    header->status = '0';
     int byteOffset = header->byteProxReg;
-    header->byteProxReg += car->tamanhoRegistro;
-    header->nroRegistros++;
+    header->byteProxReg += car->tamanhoRegistro + sizeof(car->removido) + sizeof(car->tamanhoRegistro);
+
+    // verifica se o registro é removido ou não
+    if(car->removido == '1')
+    {
+        header->nroRegistros++;
+    }
+    else
+    {
+        header->nroRegistrosRemovidos++;
+    }
+
     writeCarHeader(header, file, BIN);
     freeCarHeader(header);
     
@@ -305,8 +357,8 @@ void _writeCarToBin(Car* car, FILE* file)
     // write the car in the file
     fwrite(&car->removido,           sizeof(car->removido),          1, file);
     fwrite(&car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
-    fwrite(&car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
     fwrite(&car->prefixo,            sizeof(car->prefixo),           1, file);
+    fwrite(&car->data,               sizeof(car->data),              1, file);
     fwrite(&car->quantidadeLugares,  sizeof(car->quantidadeLugares), 1, file);
     fwrite(&car->codLinha,           sizeof(car->codLinha),          1, file);
     fwrite(&car->tamanhoModelo,      sizeof(car->tamanhoModelo),     1, file);
