@@ -134,8 +134,7 @@ Car* readCar(Car* car, FILE* file, Source from)
     switch (from)
     {
         case CSV:
-            _readCarFromCSV(car, file);
-            break;
+            return _readCarFromCSV(car, file);
 
         default:
             break;
@@ -235,13 +234,62 @@ void _updateCarFromCLI(Car* c)
 
 // Writes a Car to a specific source
 // Currently only supports BIN files.
-void writeCar(Car* c, FILE* file, Source from)
+void writeCar(Car* car, FILE* file, Source from)
 {
+    switch (from)
+    {
+        case CSV:
+            _writeCarToBin(car, file);
+            break;
 
+        default:
+            break;
+    }
 }
 
 // Writes Car to end of binary file.
-void _writeCarToBin(Car* c, FILE* bin)
+void _writeCarToBin(Car* car, FILE* file)
+{
+    // get the information from the header
+    CarHeader* header = getCarHeader(file, BIN);
+    header->status = 0;
+    int byteOffset = header->byteProxReg;
+    header->nroRegistros++;
+    writeCarHeader(header, file, BIN);
+    
+    // set the file pointer to the correct position
+    fseek(file, byteOffset, SEEK_SET);
+
+    // write the car in the file
+    fwrite(file, sizeof(car->removido),             1, car->removido);
+    fwrite(file, sizeof(car->tamanhoRegistro),      1, car->tamanhoRegistro);
+    fwrite(file, sizeof(car->tamanhoRegistro),      1, car->tamanhoRegistro);
+    fwrite(file, sizeof(car->prefixo),              1, car->prefixo);
+    fwrite(file, sizeof(car->quantidadeLugares),    1, car->quantidadeLugares);
+    fwrite(file, sizeof(car->codLinha),             1, car->codLinha);
+    fwrite(file, sizeof(car->tamanhoModelo),        1, car->tamanhoModelo);
+    fwrite(file, car->tamanhoModelo,                1, car->modelo);
+    fwrite(file, sizeof(car->tamanhoCategoria),     1, car->tamanhoCategoria);
+    fwrite(file, car->tamanhoCategoria,             1, car->categoria);
+}
+
+// Writes a CarHeader to a specific source
+// Currently only supports BIN files.
+void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
+{
+    switch (from)
+    {
+        case CSV:
+            _writeCarHeaderToBin(carHeader, file);
+            break;
+
+        default:
+            break;
+    }
+}
+
+// Write the CarHeader in a bin file
+void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
 {
 
 }
