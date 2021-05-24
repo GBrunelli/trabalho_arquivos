@@ -3,7 +3,7 @@
 
 #include "project.h"
 
-typedef enum _CarField { PREFIXO, DATA, QTD_LUGARES, COD_LINHA, MODELO, CATEGORIA } CarField;
+typedef enum _CarField { PREFIXO, DATA, QTD_LUGARES, COD_LINHA_CAR, MODELO, CATEGORIA } CarField;
 
 typedef struct _CarHeader CarHeader;
 
