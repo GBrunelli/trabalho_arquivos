@@ -13,12 +13,13 @@ void CarsCsvToBin(FILE* file, char* binFileName)
 
     // instanciate a car holder
     Car* car = newCar();
+    Car* result;
 
-    readCar(car, file, CSV);
-    while(car != NULL) // while there are cars in the csv
+    result = readCar(car, file, CSV);
+    while(result != NULL) // while there are cars in the csv
     {
         writeCar(car, bin, BIN); // write the car in the bin 
-        readCar(car, file, CSV); // read the car from the csv
+        result = readCar(car, file, CSV); // read the car from the csv
     }
 
     // free the heap used in this funtion 

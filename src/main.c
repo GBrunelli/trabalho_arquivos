@@ -37,4 +37,8 @@ int main(void) {
     default:
         break;
     }
+
+    fclose(csvFile);
+
+    return EXIT_SUCCESS;
 }

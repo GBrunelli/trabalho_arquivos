@@ -35,11 +35,8 @@ struct _Car {
 // Alocates memory and initializes the struct
 CarHeader* newCarHeader()
 {
-    CarHeader* carHeader = malloc(sizeof(CarHeader));
-    carHeader->status = 0;
+    CarHeader* carHeader = calloc(1, sizeof(CarHeader));
     carHeader->byteProxReg = 175;
-    carHeader->nroRegistros = 0;
-    carHeader->nroRegistrosRemovidos = 0;
     return carHeader;
 }
 
@@ -171,12 +168,15 @@ void leftShift(char *string, int len)
 
 Car* _readCarFromCSV(Car *car, FILE *file)
 {
+    if(car == NULL) return NULL;
+    if(file == NULL) return NULL;
+
     // read the line
     char *buffer = calloc(1, 256);
     char *buffer_pointer = buffer; // save the initial pointer location to free later
     fscanf(file, "%[^\n]%*c", buffer);
 
-    if(buffer[0] == '\n')
+    if(*buffer != 0)
     {
         // get each column
         char *token = strsep(&buffer, ",");
@@ -215,7 +215,8 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     }
     else
     {
-        car = NULL;
+        free(buffer_pointer);
+        return NULL;
     }
 
     free(buffer_pointer);
@@ -245,7 +246,7 @@ void printCar(Car* c)
 // Free all memory associated with a Car
 void freeCar(Car* c)
 {
-
+    free(c);
 }
 
 // Free all memory associated with a CarHeader
@@ -293,6 +294,7 @@ void _writeCarToBin(Car* car, FILE* file)
     getCarHeader(header, file, BIN);
     header->status = 0;
     int byteOffset = header->byteProxReg;
+    header->byteProxReg += car->tamanhoRegistro;
     header->nroRegistros++;
     writeCarHeader(header, file, BIN);
     freeCarHeader(header);
