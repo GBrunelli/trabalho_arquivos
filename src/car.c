@@ -60,22 +60,22 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
 
     // get each column
     char* token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descrevePrefixo);
+    strcpy(carHeader->descrevePrefixo, token);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descreveData);           
+    strcpy(carHeader->descreveData, token);           
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descreveLugares);
+    strcpy(carHeader->descreveLugares, token);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descreveLinha);
+    strcpy(carHeader->descreveLinha, token);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descreveModelo);
+    strcpy(carHeader->descreveModelo, token);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%[^\n]%*c", carHeader->descreveCategoria);
+    strcpy(carHeader->descreveCategoria, token);
 
     free(buffer_pointer);
 
@@ -112,7 +112,7 @@ void overwriteCarHeader(CarHeader ch, FILE* file)
 // Creates a new reusable Car.
 Car* newCar()
 {
-    Car* car = calloc(1, sizeof(Car));
+    Car* car = malloc(sizeof(struct _Car));
     car->removido = 1;
     car->tamanhoRegistro = 36;
     return car;
