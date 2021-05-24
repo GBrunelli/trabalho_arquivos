@@ -32,23 +32,6 @@ struct _Car {
 
 /* ## Functions to deal with Car headers ## */
 
-// Get all Header information from a specific source file. 
-// Currently supported sources: BIN, CSV
-CarHeader* getCarHeader(FILE* file, Source from)
-{
-    switch (from)
-    {
-        case CSV:
-            return _getCarHeaderFromCSV(file);
-        
-        case BIN:
-            return _getCarHeaderFromBin(file);
-    
-        default:
-            return NULL;
-    }
-}
-
 // Generates a CarHeader from a valid binary file. 
 CarHeader* _getCarHeaderFromBin(FILE* file)
 {
@@ -99,6 +82,23 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     return carHeader;
 }
 
+// Get all Header information from a specific source file. 
+// Currently supported sources: BIN, CSV
+CarHeader* getCarHeader(FILE* file, Source from)
+{
+    switch (from)
+    {
+        case CSV:
+            return _getCarHeaderFromCSV(file);
+        
+        case BIN:
+            return _getCarHeaderFromBin(file);
+    
+        default:
+            return NULL;
+    }
+}
+
 // Overwrite old CarHeader from file with a newer, currently in-memory one.
 void overwriteCarHeader(CarHeader ch, FILE* file)
 {
@@ -126,19 +126,6 @@ void leftShift(char *string, int len)
         string[i - 1] = string[i];
     }
     string[len -1] = '/0';
-}
-
-// Reads a car from a source file.
-Car* readCar(Car* car, FILE* file, Source from)
-{
-    switch (from)
-    {
-        case CSV:
-            return _readCarFromCSV(car, file);
-
-        default:
-            break;
-    }
 }
 
 Car* _readCarFromCSV(Car *car, FILE *file)
@@ -187,6 +174,19 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     return car;
 }
 
+// Reads a car from a source file.
+Car* readCar(Car* car, FILE* file, Source from)
+{
+    switch (from)
+    {
+        case CSV:
+            return _readCarFromCSV(car, file);
+
+        default:
+            break;
+    }
+}
+
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 void printCar(Car* c)
 {
@@ -208,14 +208,6 @@ void freeCarHeader(CarHeader* carHeader)
 
 /* ## Functions related to updating Cars from different sources. ## */
 
-// Updates a Car with data from a specific source. 
-// Currently supported sources: BIN, CLI, CSV
-// If updating from CLI, file should be NULL.
-void updateCar(Car* c, FILE* file, Source from)
-{
-
-}
-
 // Update Car from BIN file using fromByte as offset.
 // If fromByte == CURRENT_POSITION. Ignore any offset and uses current position
 void _updateCarFromBin(Car* c, FILE* bin, int64_t fromByte)
@@ -235,23 +227,15 @@ void _updateCarFromCLI(Car* c)
 
 }
 
+// Updates a Car with data from a specific source. 
+// Currently supported sources: BIN, CLI, CSV
+// If updating from CLI, file should be NULL.
+void updateCar(Car* c, FILE* file, Source from)
+{
+
+}
 
 /* ## Functions related to writing Cars to different sources ## */
-
-// Writes a Car to a specific source
-// Currently only supports BIN files.
-void writeCar(Car* car, FILE* file, Source from)
-{
-    switch (from)
-    {
-        case CSV:
-            _writeCarToBin(car, file);
-            break;
-
-        default:
-            break;
-    }
-}
 
 // Writes Car to end of binary file.
 void _writeCarToBin(Car* car, FILE* file)
@@ -279,14 +263,14 @@ void _writeCarToBin(Car* car, FILE* file)
     fwrite(&car->categoria,          car->tamanhoCategoria,          1, file);
 }
 
-// Writes a CarHeader to a specific source
+// Writes a Car to a specific source
 // Currently only supports BIN files.
-void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
+void writeCar(Car* car, FILE* file, Source from)
 {
     switch (from)
     {
         case CSV:
-            _writeCarHeaderToBin(carHeader, file);
+            _writeCarToBin(car, file);
             break;
 
         default:
@@ -312,6 +296,20 @@ void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
     fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveModelo),          1, file);    
 }
 
+// Writes a CarHeader to a specific source
+// Currently only supports BIN files.
+void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
+{
+    switch (from)
+    {
+        case CSV:
+            _writeCarHeaderToBin(carHeader, file);
+            break;
+
+        default:
+            break;
+    }
+}
 
 /* ## Functions related to searching using a specific struct field ## */
 
