@@ -146,6 +146,20 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
     }
 }
 
+// Set the status of a file as consistent '1' or inconsistent '0'
+void setFileStatus(FILE *file, char c)
+{
+    if(c == '0' || c == '1')
+    {
+        CarHeader* header = newCarHeader();
+        header = getCarHeader(header, file, BIN);
+        header->status = c;
+        freeCarHeader(header);
+    }
+}
+
+
+
 /* ## Basic Car functions ## */
 
 // Creates a new reusable Car.
@@ -297,6 +311,9 @@ void freeCarHeader(CarHeader* carHeader)
     free(carHeader);
 }
 
+
+
+
 /* ## Functions related to updating Cars from different sources. ## */
 
 // Update Car from BIN file using fromByte as offset.
@@ -325,6 +342,9 @@ void updateCar(Car* c, FILE* file, Source from)
 {
 
 }
+
+
+
 
 /* ## Functions related to writing Cars to different sources ## */
 
@@ -381,6 +401,9 @@ void writeCar(Car* car, FILE* file, Source from)
             break;
     }
 }
+
+
+
 
 /* ## Functions related to searching using a specific struct field ## */
 
