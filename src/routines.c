@@ -7,9 +7,9 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     FILE* bin = fopen(binFileName, "wb");
     
     // read the header from the csv and write in the bin
-    CarHeader* carHeader = getCarHeader(file, CSV);
+    CarHeader* carHeader = newCarHeader();
+    getCarHeader(carHeader, file, CSV);
     writeCarHeader(carHeader, bin, BIN);
-    freeCarHeader(carHeader);
 
     // instanciate a car holder
     Car* car = newCar();
@@ -23,5 +23,6 @@ void CarsCsvToBin(FILE* file, char* binFileName)
 
     // free the heap used in this funtion 
     fclose(bin);
+    freeCarHeader(carHeader);
     freeCar(car);
 }

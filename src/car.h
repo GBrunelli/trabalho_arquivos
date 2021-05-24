@@ -11,9 +11,12 @@ typedef struct _Car Car;
 
 /* ## Functions to deal with Car headers ## */
 
+// Creates a new reusable CarHeader.
+CarHeader* newCarHeader();
+
 // Get all Header information from a specific source file. 
 // Currently supported sources: BIN, CSV
-CarHeader* getCarHeader(FILE* file, Source from);
+CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from);
 
 // Overwrite old CarHeader from file with a newer, currently in-memory one.
 void overwriteCarHeader(CarHeader ch, FILE* file);

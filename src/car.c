@@ -32,10 +32,20 @@ struct _Car {
 
 /* ## Functions to deal with Car headers ## */
 
-// Generates a CarHeader from a valid binary file. 
-CarHeader* _getCarHeaderFromBin(FILE* file)
+CarHeader* newCarHeader()
 {
-    return NULL;
+    CarHeader* carHeader = malloc(sizeof(CarHeader));
+    carHeader->status = 0;
+    carHeader->byteProxReg = 175;
+    carHeader->nroRegistros = 0;
+    carHeader->nroRegistrosRemovidos = 0;
+    return carHeader;
+}
+
+// Generates a CarHeader from a valid binary file. 
+CarHeader* _getCarHeaderFromBin(CarHeader* carHeader, FILE* file)
+{
+    fseek(file, 0, SEEK_SET);
 }
 
 /**
@@ -43,14 +53,8 @@ CarHeader* _getCarHeaderFromBin(FILE* file)
  * */
 // Generates a CarHeader from a valid CSV file. 
 // Must be first command used on CSV File or will not work.
-CarHeader* _getCarHeaderFromCSV(FILE* file)
-{
-    CarHeader* carHeader = malloc(sizeof(CarHeader));
-    carHeader->status = 0;
-    carHeader->byteProxReg = 175;
-    carHeader->nroRegistros = 0;
-    carHeader->nroRegistrosRemovidos = 0;
-    
+CarHeader* _getCarHeaderFromCSV(CarHeader* carHeader, FILE* file)
+{    
     // set the pointer to the start of the file
     fseek(file, 0, SEEK_SET);
 
@@ -85,15 +89,15 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
 
 // Get all Header information from a specific source file. 
 // Currently supported sources: BIN, CSV
-CarHeader* getCarHeader(FILE* file, Source from)
+CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from)
 {
     switch (from)
     {
         case CSV:
-            return _getCarHeaderFromCSV(file);
+            return _getCarHeaderFromCSV(carHeader, file);
         
         case BIN:
-            return _getCarHeaderFromBin(file);
+            return _getCarHeaderFromBin(carHeader, file);
     
         default:
             break;
@@ -251,7 +255,8 @@ void updateCar(Car* c, FILE* file, Source from)
 void _writeCarToBin(Car* car, FILE* file)
 {
     // gets the information from the header and update it
-    CarHeader* header = getCarHeader(file, BIN);
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, file, BIN);
     header->status = 0;
     int byteOffset = header->byteProxReg;
     header->nroRegistros++;
