@@ -125,7 +125,7 @@ void leftShift(char *string, int len)
     {
         string[i - 1] = string[i];
     }
-    string[len -1] = '/0';
+    string[len -1] = "\0";
 }
 
 Car* _readCarFromCSV(Car *car, FILE *file)
