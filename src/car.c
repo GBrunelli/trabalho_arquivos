@@ -271,8 +271,6 @@ void _writeCarToBin(Car* car, FILE* file)
     fwrite(&car->modelo,             car->tamanhoModelo,             1, file);
     fwrite(&car->tamanhoCategoria,   sizeof(car->tamanhoCategoria),  1, file);
     fwrite(&car->categoria,          car->tamanhoCategoria,          1, file);
-
-
 }
 
 // Writes a CarHeader to a specific source
@@ -293,23 +291,19 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 // Write the CarHeader in a bin file
 void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
 {
-    /*
-    int8_t status;
-    int64_t byteProxReg;
-    int32_t nroRegistros;
-    int32_t nroRegistrosRemovidos;
-    char descrevePrefixo[18];
-    char descreveData[35];
-    char descreveLugares[42];
-    char descreveLinha[26];
-    char descreveModelo[17];
-    char descreveCategoria[20];
-    */
-
     // set the file pointer to the correct position
     fseek(file, 0, SEEK_SET);
 
-    
+    // write the data on the file
+    fwrite(&carHeader->status,                  sizeof(carHeader->status),                  1, file);
+    fwrite(&carHeader->byteProxReg,             sizeof(carHeader->byteProxReg),             1, file);
+    fwrite(&carHeader->nroRegistros,            sizeof(carHeader->nroRegistros),            1, file);
+    fwrite(&carHeader->nroRegistrosRemovidos,   sizeof(carHeader->nroRegistrosRemovidos),   1, file);
+    fwrite(&carHeader->descrevePrefixo,         sizeof(carHeader->descrevePrefixo),         1, file);
+    fwrite(&carHeader->descreveData,            sizeof(carHeader->descreveData),            1, file);
+    fwrite(&carHeader->descreveLugares,         sizeof(carHeader->descreveLugares),         1, file);
+    fwrite(&carHeader->descreveLinha,           sizeof(carHeader->descreveLinha),           1, file);
+    fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveModelo),          1, file);    
 }
 
 
