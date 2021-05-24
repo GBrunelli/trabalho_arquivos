@@ -46,6 +46,8 @@ void updateCar(Car* c, FILE* file, Source from);
 // Currently only supports BIN files.
 void writeCar(Car* c, FILE* file, Source from);
 
+void writeCarHeader(CarHeader* carHeader, FILE* file, Source from);
+
 /* ## Functions related to searching using a specific struct field ## */
 
 // Checks what struct field to use in search, 
