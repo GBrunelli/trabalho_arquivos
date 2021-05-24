@@ -4,7 +4,7 @@
 void CarsCsvToBin(FILE* file, char* binFileName)
 {
     // open the binary file
-    FILE* bin = fopen(binFileName, "wb");
+    FILE* bin = fopen(binFileName, "wb+");
     
     // read the header from the csv and write in the bin
     CarHeader* carHeader = newCarHeader();
@@ -17,8 +17,8 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     readCar(car, file, CSV);
     while(car != NULL) // while there are cars in the csv
     {
-        writeCar(car, bin, BIN); // read the car from the csv
-        readCar(car, file, CSV); // write the car in the bin
+        writeCar(car, bin, BIN); // write the car in the bin 
+        readCar(car, file, CSV); // read the car from the csv
     }
 
     // free the heap used in this funtion 

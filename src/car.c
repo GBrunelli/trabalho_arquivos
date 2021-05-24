@@ -32,6 +32,7 @@ struct _Car {
 
 /* ## Functions to deal with Car headers ## */
 
+// Alocates memory and initializes the struct
 CarHeader* newCarHeader()
 {
     CarHeader* carHeader = malloc(sizeof(CarHeader));
@@ -46,11 +47,19 @@ CarHeader* newCarHeader()
 CarHeader* _getCarHeaderFromBin(CarHeader* carHeader, FILE* file)
 {
     fseek(file, 0, SEEK_SET);
+    fread(&carHeader->status,                   sizeof(carHeader->status),                  1, file);
+    fread(&carHeader->byteProxReg,              sizeof(carHeader->byteProxReg),             1, file);
+    fread(&carHeader->nroRegistros,             sizeof(carHeader->nroRegistros),            1, file);
+    fread(&carHeader->nroRegistrosRemovidos,    sizeof(carHeader->nroRegistrosRemovidos),   1, file);
+    fread(&carHeader->descrevePrefixo,          sizeof(carHeader->descrevePrefixo),         1, file);
+    fread(&carHeader->descreveData,             sizeof(carHeader->descreveData),            1, file);
+    fread(&carHeader->descreveLugares,          sizeof(carHeader->descreveLugares),         1, file);
+    fread(&carHeader->descreveLinha,            sizeof(carHeader->descreveLinha),           1, file);
+    fread(&carHeader->descreveModelo,           sizeof(carHeader->descreveModelo),          1, file);
+    fread(&carHeader->descreveCategoria,        sizeof(carHeader->descreveCategoria),       1, file);
+    return carHeader;
 }
 
-/**
- * NEED TO TEST 
- * */
 // Generates a CarHeader from a valid CSV file. 
 // Must be first command used on CSV File or will not work.
 CarHeader* _getCarHeaderFromCSV(CarHeader* carHeader, FILE* file)
@@ -105,12 +114,38 @@ CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from)
     return NULL;
 }
 
-// Overwrite old CarHeader from file with a newer, currently in-memory one.
-void overwriteCarHeader(CarHeader ch, FILE* file)
+// Write the CarHeader in a bin file
+void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
 {
+    // set the file pointer to the correct position
+    fseek(file, 0, SEEK_SET);
 
+    // write the data on the file
+    fwrite(&carHeader->status,                  sizeof(carHeader->status),                  1, file);
+    fwrite(&carHeader->byteProxReg,             sizeof(carHeader->byteProxReg),             1, file);
+    fwrite(&carHeader->nroRegistros,            sizeof(carHeader->nroRegistros),            1, file);
+    fwrite(&carHeader->nroRegistrosRemovidos,   sizeof(carHeader->nroRegistrosRemovidos),   1, file);
+    fwrite(&carHeader->descrevePrefixo,         sizeof(carHeader->descrevePrefixo),         1, file);
+    fwrite(&carHeader->descreveData,            sizeof(carHeader->descreveData),            1, file);
+    fwrite(&carHeader->descreveLugares,         sizeof(carHeader->descreveLugares),         1, file);
+    fwrite(&carHeader->descreveLinha,           sizeof(carHeader->descreveLinha),           1, file);
+    fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveModelo),          1, file);    
 }
 
+// Writes a CarHeader to a specific source
+// Currently only supports BIN files.
+void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
+{
+    switch (from)
+    {
+        case BIN:
+            _writeCarHeaderToBin(carHeader, file);
+            break;
+
+        default:
+            break;
+    }
+}
 
 /* ## Basic Car functions ## */
 
@@ -141,7 +176,7 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     char *buffer_pointer = buffer; // save the initial pointer location to free later
     fscanf(file, "%[^\n]%*c", buffer);
 
-    if(strlen(buffer) > 0)
+    if(buffer[0] == '\n')
     {
         // get each column
         char *token = strsep(&buffer, ",");
@@ -219,7 +254,6 @@ void freeCarHeader(CarHeader* carHeader)
     free(carHeader);
 }
 
-
 /* ## Functions related to updating Cars from different sources. ## */
 
 // Update Car from BIN file using fromByte as offset.
@@ -261,6 +295,7 @@ void _writeCarToBin(Car* car, FILE* file)
     int byteOffset = header->byteProxReg;
     header->nroRegistros++;
     writeCarHeader(header, file, BIN);
+    freeCarHeader(header);
     
     // set the file pointer to the correct position
     fseek(file, byteOffset, SEEK_SET);
@@ -286,39 +321,6 @@ void writeCar(Car* car, FILE* file, Source from)
     {
         case BIN:
             _writeCarToBin(car, file);
-            break;
-
-        default:
-            break;
-    }
-}
-
-// Write the CarHeader in a bin file
-void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
-{
-    // set the file pointer to the correct position
-    fseek(file, 0, SEEK_SET);
-
-    // write the data on the file
-    fwrite(&carHeader->status,                  sizeof(carHeader->status),                  1, file);
-    fwrite(&carHeader->byteProxReg,             sizeof(carHeader->byteProxReg),             1, file);
-    fwrite(&carHeader->nroRegistros,            sizeof(carHeader->nroRegistros),            1, file);
-    fwrite(&carHeader->nroRegistrosRemovidos,   sizeof(carHeader->nroRegistrosRemovidos),   1, file);
-    fwrite(&carHeader->descrevePrefixo,         sizeof(carHeader->descrevePrefixo),         1, file);
-    fwrite(&carHeader->descreveData,            sizeof(carHeader->descreveData),            1, file);
-    fwrite(&carHeader->descreveLugares,         sizeof(carHeader->descreveLugares),         1, file);
-    fwrite(&carHeader->descreveLinha,           sizeof(carHeader->descreveLinha),           1, file);
-    fwrite(&carHeader->descreveCategoria,       sizeof(carHeader->descreveModelo),          1, file);    
-}
-
-// Writes a CarHeader to a specific source
-// Currently only supports BIN files.
-void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
-{
-    switch (from)
-    {
-        case BIN:
-            _writeCarHeaderToBin(carHeader, file);
             break;
 
         default:
