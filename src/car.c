@@ -59,22 +59,22 @@ CarHeader* _getCarHeaderFromCSV(FILE* file)
     fscanf(file, "%s", buffer);
 
     // get each column
-    char *token = strsep(&buffer, ",");
+    char* token = strsep(&buffer, ",");
     sscanf(token, "%s", carHeader->descrevePrefixo);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", carHeader->descreveData);           
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveLugares);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%s", carHeader->descreveLinha);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveModelo);
 
-    *token = strsep(&buffer, ",");
+    token = strsep(&buffer, ",");
     sscanf(token, "%d", carHeader->descreveCategoria);
 
     free(buffer_pointer);
