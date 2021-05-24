@@ -154,6 +154,7 @@ void setFileStatus(FILE *file, char c)
         CarHeader* header = newCarHeader();
         header = getCarHeader(header, file, BIN);
         header->status = c;
+        writeCarHeader(header, file, BIN);
         freeCarHeader(header);
     }
 }
