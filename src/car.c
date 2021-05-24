@@ -194,7 +194,13 @@ void printCar(Car* c)
 }
 
 // Free all memory associated with a Car
-void freeMemCar(Car* c)
+void freeCar(Car* c)
+{
+
+}
+
+// Free all memory associated with a CarHeader
+void freeCarHeader(CarHeader* carHeader)
 {
 
 }

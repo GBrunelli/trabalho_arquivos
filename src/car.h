@@ -31,7 +31,10 @@ Car* readCar(Car *c, FILE* file, Source From);
 void printCar(Car* c);
 
 // Free all memory associated with a Car
-void freeMemCar(Car* c);
+void freeCar(Car* c);
+
+// Free all memory associated with a CarHeader
+void freeCarHeader(CarHeader* carHeader);
 
 /* ## Functions related to updating Cars from different sources. ## */
 
