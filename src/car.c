@@ -143,10 +143,10 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     sscanf(token, "%s", car->data);     
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%d", car->quantidadeLugares);
+    sscanf(token, "%d", &car->quantidadeLugares);
 
     token = strsep(&buffer, ",");
-    sscanf(token, "%s", car->codLinha);
+    sscanf(token, "%d", &car->codLinha);
 
     token = strsep(&buffer, ",");
     sscanf(token, "%s", car->modelo);
