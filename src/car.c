@@ -279,7 +279,7 @@ void writeCar(Car* car, FILE* file, Source from)
 {
     switch (from)
     {
-        case CSV:
+        case BIN:
             _writeCarToBin(car, file);
             break;
 
