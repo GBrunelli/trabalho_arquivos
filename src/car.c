@@ -261,16 +261,16 @@ void _writeCarToBin(Car* car, FILE* file)
     fseek(file, byteOffset, SEEK_SET);
 
     // write the car in the file
-    fwrite(car->removido,           sizeof(car->removido),          1, file);
-    fwrite(car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
-    fwrite(car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
-    fwrite(car->prefixo,            sizeof(car->prefixo),           1, file);
-    fwrite(car->quantidadeLugares,  sizeof(car->quantidadeLugares), 1, file);
-    fwrite(car->codLinha,           sizeof(car->codLinha),          1, file);
-    fwrite(car->tamanhoModelo,      sizeof(car->tamanhoModelo),     1, file);
-    fwrite(car->modelo,             car->tamanhoModelo,             1, file);
-    fwrite(car->tamanhoCategoria,   sizeof(car->tamanhoCategoria),  1, file);
-    fwrite(car->categoria,          car->tamanhoCategoria,          1, file);
+    fwrite(&car->removido,           sizeof(car->removido),          1, file);
+    fwrite(&car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
+    fwrite(&car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
+    fwrite(&car->prefixo,            sizeof(car->prefixo),           1, file);
+    fwrite(&car->quantidadeLugares,  sizeof(car->quantidadeLugares), 1, file);
+    fwrite(&car->codLinha,           sizeof(car->codLinha),          1, file);
+    fwrite(&car->tamanhoModelo,      sizeof(car->tamanhoModelo),     1, file);
+    fwrite(&car->modelo,             car->tamanhoModelo,             1, file);
+    fwrite(&car->tamanhoCategoria,   sizeof(car->tamanhoCategoria),  1, file);
+    fwrite(&car->categoria,          car->tamanhoCategoria,          1, file);
 
 
 }
@@ -308,6 +308,8 @@ void _writeCarHeaderToBin(CarHeader* carHeader, FILE* file)
 
     // set the file pointer to the correct position
     fseek(file, 0, SEEK_SET);
+
+    
 }
 
 
