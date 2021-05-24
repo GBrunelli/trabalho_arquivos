@@ -132,7 +132,6 @@ void leftShift(char *string, int len)
 
 Car* _readCarFromCSV(Car *car, FILE *file)
 {
-    car = NULL;
     // read the line
     char *buffer = calloc(1, 256);
     char *buffer_pointer = buffer; // save the initial pointer location to free later
@@ -174,6 +173,10 @@ Car* _readCarFromCSV(Car *car, FILE *file)
 
         // calculates the size of the register
         car->tamanhoRegistro += lenghtModelo + lenghtCategoria;
+    }
+    else
+    {
+        car = NULL;
     }
 
     free(buffer_pointer);
