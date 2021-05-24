@@ -9,12 +9,18 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     // read the header from the csv
     CarHeader* carHeader = getCarHeader(file, CSV);
 
-    // while there are cars in the csv
+    // write the header
+    writeCarHeader(carHeader, file, BIN);
 
-        // read the car from the csv
-        // write the car in the bin
+    // instanciate a car holder
+    Car* car = newCar();
 
-    // write the header in the bin
+    readCar(car, file, CSV);
+    while(car != NULL) // while there are cars in the csv
+    {
+        writeCar(car, bin, BIN); // read the car from the csv
+        readCar(car, file, CSV); // write the car in the bin
+    }
 
     // free the memory
 }
