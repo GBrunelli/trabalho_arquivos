@@ -1,11 +1,9 @@
 #include "car.h"
 
-void CarsCsvToBin()
+void CarsCsvToBin(FILE* csv, char* binFileName)
 {
     // open the binary file
-
-    FILE* csv = fopen("tests/veiculo1.csv", "r"); // TEST
-    FILE* bin = fopen("veiculo1.bin", "wb+");
+    FILE* bin = fopen(binFileName, "wb+");
     
     // read the header from the csv and write in the bin
     CarHeader* carHeader = newCarHeader();
