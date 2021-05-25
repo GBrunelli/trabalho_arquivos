@@ -40,7 +40,9 @@ CarHeader* newCarHeader()
     return carHeader;
 }
 
-// Generates a CarHeader from a valid binary file. 
+// Generates a CarHeader from a valid binary file.
+// ! Não precisa retornar em nenhuma dessas funções
+// ! Passou como ponteiro ele já altera no próprio fread
 CarHeader* _getCarHeaderFromBin(CarHeader* carHeader, FILE* file)
 {
     fseek(file, 0, SEEK_SET);
@@ -88,7 +90,7 @@ CarHeader* _getCarHeaderFromCSV(CarHeader* carHeader, FILE* file)
     token = strsep(&buffer, ",");
     strcpy(carHeader->descreveCategoria, token);
 
-    free(buffer_pointer);  
+    free(buffer_pointer);
 
     return carHeader;
 }

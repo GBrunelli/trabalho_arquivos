@@ -2,6 +2,7 @@
 #define CAR_H
 
 #include "project.h"
+#include "utils.h"
 
 typedef enum _CarField { PREFIXO, DATA, QTD_LUGARES, COD_LINHA_CAR, MODELO, CATEGORIA } CarField;
 
