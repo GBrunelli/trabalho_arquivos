@@ -147,7 +147,7 @@ void _updateLineFromCSVLine(Line* l, FILE* file) {
     fscanf(file, "%[^\n]%*c", buffer);
     if (*buffer == 0)
         free(buffer_pointer);
-        return;
+    return;
 
 
 };
