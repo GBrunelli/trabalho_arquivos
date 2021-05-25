@@ -1,13 +1,15 @@
 #include "car.h"
 
-void CarsCsvToBin(FILE* file, char* binFileName)
+void CarsCsvToBin()
 {
     // open the binary file
-    FILE* bin = fopen(binFileName, "wb+");
+
+    FILE* csv = fopen("tests/veiculo1.csv", "r"); // TEST
+    FILE* bin = fopen("veiculo1.bin", "wb+");
     
     // read the header from the csv and write in the bin
     CarHeader* carHeader = newCarHeader();
-    getCarHeader(carHeader, file, CSV);
+    getCarHeader(carHeader, csv, CSV);
     writeCarHeader(carHeader, bin, BIN);
 
     // set the file status as inconsistent 
@@ -17,11 +19,11 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     Car* car = newCar();
     Car* result;
 
-    result = readCar(car, file, CSV);
+    result = readCar(car, csv, CSV);
     while(result != NULL) // while there are cars in the csv
     {
         writeCar(car, bin, BIN); // write the car in the bin 
-        result = readCar(car, file, CSV); // read the car from the csv
+        result = readCar(car, csv, CSV); // read the car from the csv
     }
 
     // set the file status as consistent 
