@@ -11,7 +11,7 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     writeCarHeader(carHeader, bin, BIN);
 
     // set the file status as inconsistent 
-    setFileStatus(bin, '0');
+    setFileStatus(bin, STATUS_INCONSISTENT);
 
     // instanciate a car holder
     Car* car = newCar();
@@ -25,7 +25,7 @@ void CarsCsvToBin(FILE* file, char* binFileName)
     }
 
     // set the file status as consistent 
-    setFileStatus(bin, '1');
+    setFileStatus(bin, STATUS_CONSISTENT);
 
     // free the heap used in this funtion 
     fclose(bin);
