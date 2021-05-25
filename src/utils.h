@@ -9,6 +9,9 @@
 // Maximum field size for each struct.
 #define MAX_STRING_SIZE 100
 
+#define REMOVED '0'
+#define NOT_REMOVED '1'
+
 // Possible file sources.
 typedef enum _Source { CSV, CLI, BIN } Source;
 

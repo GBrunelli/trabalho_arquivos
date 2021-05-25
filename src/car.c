@@ -150,7 +150,7 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 // Set the status of a file as consistent '1' or inconsistent '0'
 void setFileStatus(FILE *file, char c)
 {
-    if(c == '0' || c == '1')
+    if(c == REMOVED || c == NOT_REMOVED)
     {
         CarHeader* header = newCarHeader();
         header = getCarHeader(header, file, BIN);
@@ -168,7 +168,7 @@ void setFileStatus(FILE *file, char c)
 Car* newCar()
 {
     Car* car = malloc(sizeof(struct _Car));
-    car->removido = '1';
+    car->removido = NOT_REMOVED;
     car->tamanhoRegistro = STRUCT_BASE_CAR_SIZE;
     return car;
 }
@@ -227,11 +227,11 @@ Car* _readCarFromCSV(Car *car, FILE *file)
         // verify if the register is removed
         if(car->prefixo[0] == '*')
         {
-            car->removido = '0';
+            car->removido = REMOVED;
             leftShift(car->prefixo, 5);
         }
         else 
-            car->removido = '1';
+            car->removido = NOT_REMOVED;
 
         // calculates the lenght of car->modelo and car->categoria
         int lenghtModelo = strlen(car->modelo);
@@ -332,7 +332,7 @@ void _writeCarToBin(Car* car, FILE* file)
     header->byteProxReg += car->tamanhoRegistro + sizeof(car->removido) + sizeof(car->tamanhoRegistro);
 
     // verifica se o registro é removido ou não
-    if(car->removido == '1')
+    if(car->removido == NOT_REMOVED)
     {
         header->nroRegistros++;
     }
