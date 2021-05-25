@@ -27,10 +27,13 @@ typedef enum _FuncStatus { UNKNOWN_ERR, OK } FuncStatus;
 
 
 
-
+// Our utils
 void leftShift(char *string, int len);
 int isNULO(char* string);
 void fillWithGarbage(char* string, int len);
 
+// Supplied functions
+void binarioNaTela(char *nomeArquivoBinario);
+void scan_quote_string(char *str);
 
 #endif

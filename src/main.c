@@ -3,19 +3,16 @@
 
 int main(void) {
     // Routine to be executed
-    int8_t n_routine = 1;
-    //scanf("%d", &n_routine);
-
-    // TODO: read input
+    int n_routine = 0;
+    scanf("%d", &n_routine);
     
-    FILE* csvFile = fopen("tests/veiculo1.csv", "r"); // TEST
 
     switch (n_routine) {
     case 1:
-        CarsCsvToBin(csvFile, "veiculo1.bin"); // TEST
+        CarsCsvToBin();
         break;
     case 2:
-        //LinesCsvToBin();
+        LinesCsvToBin();
         break;
     case 3:
         //printAllCars();
@@ -38,8 +35,6 @@ int main(void) {
     default:
         break;
     }
-
-    fclose(csvFile);
 
     return EXIT_SUCCESS;
 }
