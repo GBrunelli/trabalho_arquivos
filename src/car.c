@@ -2,7 +2,7 @@
 #include "utils.h"
 
 #define STRUCT_CAR_HEADER_SIZE 175
-#define STRUCT_BASE_CAR_SIZE 31
+#define STRUCT_BASE_CAR_SIZE 31 // ! Não seria 32? Já que vai de 0...31
 
 struct _CarHeader {
     char status;
