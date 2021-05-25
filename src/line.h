@@ -2,49 +2,34 @@
 #define LINE_H
 
 #include "project.h"
+#include "utils.h"
 
 // Use current file position instead of a specific offset.
 #define CURRENT_POSITION -11
 
 typedef enum _LineField { COD_LINHA, ACEITA_CARTAO, LINHA, COR } LineField;
 
-typedef struct _LineHeader {
-    int8_t status;
-    int64_t byteProxReg;
-    int32_t nroRegistros;
-    int32_t nroRegistrosRemovidos;
-    char descreveCodigo[15];
-    char descreveCartao[13];
-    char descreveNome[13];
-    char descreveCor[24];
-} LineHeader;
+typedef struct _LineHeader LineHeader;
 
-typedef struct _Line {
-    int8_t removido;
-    int32_t tamanhoRegistro;
-    int32_t codLinha;
-    int8_t aceitaCartao;
-    int32_t tamanhoNome;
-    char nomeLinha[MAX_STRING_SIZE];
-    int32_t tamanhoCor;
-    char nomeCor[MAX_STRING_SIZE];
-} Line;
+typedef struct _Line Line;
 
 /* ## Functions to deal with line headers ## */
 
 // Get all Header information from a specific source file. 
 // Currently supported sources: BIN, CSV
-LineHeader getLineHeader(FILE* file, Source from);
+void getLineHeader(LineHeader* lh, FILE* file, Source from);
 
 // Generates a LineHeader from a valid binary file. 
-LineHeader _getLineHeaderFromBin(FILE* file);
+void _getLineHeaderFromBin(LineHeader* lh, FILE* file);
 
 // Generates a LineHeader from a valid CSV file. 
 // Must be first command used on CSV File or will not work.
-LineHeader _getLineHeaderFromCSV(FILE* file);
+void _getLineHeaderFromCSV(LineHeader* lh, FILE* file);
 
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
-void overwriteLineHeader(LineHeader lh, FILE* file);
+void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
+
+void freeLineHeader(LineHeader* lh);
 
 /* ## Basic line functions ## */
 
