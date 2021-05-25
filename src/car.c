@@ -1,4 +1,5 @@
 #include "car.h"
+#include "utils.h"
 
 #define STRUCT_CAR_HEADER_SIZE 175
 #define STRUCT_BASE_CAR_SIZE 31
@@ -168,35 +169,6 @@ Car* newCar()
     car->removido = '1';
     car->tamanhoRegistro = STRUCT_BASE_CAR_SIZE;
     return car;
-}
-
-// Shifts a string to left.
-void leftShift(char *string, int len)
-{
-    int i;
-    for(i = 1; i < len; i++)
-    {
-        string[i - 1] = string[i];
-    }
-    string[len - 1] = 0;
-}
-
-int isNULO(char* string)
-{
-    if(!strcmp(string, "NULO"))
-    {
-        return 1;
-    }
-    return 0;
-}
-
-void fillWithGarbage(char* string, int len)
-{
-    string[0] = 0;
-    for (int i = 1; i < len; i++)
-    {
-        string[i] = '@';
-    }
 }
 
 Car* _readCarFromCSV(Car *car, FILE *file)
