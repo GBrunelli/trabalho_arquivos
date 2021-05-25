@@ -72,23 +72,24 @@ CarHeader* _getCarHeaderFromCSV(CarHeader* carHeader, FILE* file)
     fscanf(file, "%[^\n]%*c", buffer);
 
     // get each column
-    char* token = strsep(&buffer, ",");
-    strcpy(carHeader->descrevePrefixo, token);
+    char* token;
+    token = strsep(&buffer, ",");
+    strncpy(carHeader->descrevePrefixo,   token, sizeof(carHeader->descrevePrefixo));
 
     token = strsep(&buffer, ",");
-    strcpy(carHeader->descreveData, token);           
+    strncpy(carHeader->descreveData,      token, sizeof(carHeader->descreveData));           
 
     token = strsep(&buffer, ",");
-    strcpy(carHeader->descreveLugares, token);
+    strncpy(carHeader->descreveLugares,   token, sizeof(carHeader->descreveLugares));
 
     token = strsep(&buffer, ",");
-    strcpy(carHeader->descreveLinha, token);
+    strncpy(carHeader->descreveLinha,     token, sizeof(carHeader->descreveLinha));
 
     token = strsep(&buffer, ",");
-    strcpy(carHeader->descreveModelo, token);
+    strncpy(carHeader->descreveModelo,    token, sizeof(carHeader->descreveModelo));
 
     token = strsep(&buffer, ",");
-    strcpy(carHeader->descreveCategoria, token);
+    strncpy(carHeader->descreveCategoria, token, sizeof(carHeader->descreveCategoria));
 
     free(buffer_pointer);
 
@@ -187,14 +188,14 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     {
         // get each column
         char *token = strsep(&buffer, ",");
-        strcpy(car->prefixo, token);
+        strncpy(car->prefixo, token, sizeof(car->prefixo));
 
         // DATA
         token = strsep(&buffer, ",");
         if(isNULO(token))
             fillWithGarbage(car->data, sizeof(car->data));
         else
-            strcpy(car->data, token);     
+            strncpy(car->data, token, sizeof(car->data));     
         
         // QUANTIDADE DE LUGARES
         token = strsep(&buffer, ",");
@@ -215,14 +216,14 @@ Car* _readCarFromCSV(Car *car, FILE *file)
         if(isNULO(token))
             fillWithGarbage(car->modelo, sizeof(car->modelo));
         else
-            strcpy(car->modelo, token);    
+            strncpy(car->modelo, token, sizeof(car->modelo));    
 
         // CATEGORIA
         token = strsep(&buffer, ",");
         if(isNULO(token))
             fillWithGarbage(car->categoria, sizeof(car->categoria));
         else
-            strcpy(car->categoria, token);         
+            strncpy(car->categoria, token, sizeof(car->categoria));         
 
         // verify if the register is removed
         if(car->prefixo[0] == '*')
