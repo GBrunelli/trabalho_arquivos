@@ -1,5 +1,6 @@
 // #include "car_routines.h"
 #include "line_routines.h"
+#include "car_routines.h"
 
 int main(void) {
     // Routine to be executed
@@ -9,13 +10,13 @@ int main(void) {
 
     switch (n_routine) {
     case 1:
-        // CarsCsvToBin();
+        CarsCsvToBin();
         break;
     case 2:
         LinesCsvToBin();
         break;
     case 3:
-        //printAllCars();
+        printAllCars();
         break;
     case 4:
         printAllLines();
@@ -24,7 +25,7 @@ int main(void) {
         //printSelectedCars();
         break;
     case 6:
-        //printSelectedLines();
+        printSelectedLines();
         break;
     case 7:
         //InsertNewCarsBin();

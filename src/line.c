@@ -100,6 +100,14 @@ void updateLineHeader(LineHeader* LineHeader, FILE* file, Source from)
     }
 }
 
+int getNRegisters(LineHeader* lh) {
+    return lh->nroRegistros;
+}
+
+int getNRemovedRegisters(LineHeader* lh) {
+    return lh->nroRegistrosRemovidos;
+}
+
 void _overwriteLineHeaderToBin(LineHeader* lh, FILE* file)
 {
     // set the file pointer to the correct position
@@ -190,12 +198,37 @@ FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
     return OK;
 };
 
+FuncStatus _updateLineFromBin(Line* l, FILE* file) {
+    if (l == NULL) return UNKNOWN_ERR;
+    if (file == NULL) return UNKNOWN_ERR;
+
+    // if the pointer is pointing at the header, set the pointer for the first car in the file
+    long long position = ftell(file);
+    long long offset = position < LINE_HEADER_OFFSET ? LINE_HEADER_OFFSET : position;
+    fseek(file, offset, SEEK_SET);
+
+    fread(&l->removido, sizeof(l->removido), 1, file);
+    fread(&l->tamanhoRegistro, sizeof(l->tamanhoRegistro), 1, file);
+    fread(&l->codLinha, sizeof(l->codLinha), 1, file);
+    fread(&l->aceitaCartao, sizeof(l->aceitaCartao), 1, file);
+    fread(&l->tamanhoNome, sizeof(l->tamanhoNome), 1, file);
+    fread(&l->nomeLinha, l->tamanhoNome, 1, file);
+    fread(&l->tamanhoCor, sizeof(l->tamanhoCor), 1, file);
+    fread(&l->nomeCor, l->tamanhoCor, 1, file);
+
+    l->nomeLinha[l->tamanhoNome] = '\0';
+    l->nomeCor[l->tamanhoCor] = '\0';
+
+    return OK;
+}
+
 FuncStatus updateLine(Line* l, FILE* file, Source from) {
-    switch (from)
-    {
+    switch (from) {
     case CSV:
         return _updateLineFromCSVLine(l, file);
         break;
+    case BIN:
+        return _updateLineFromBin(l, file);
     default:
         break;
     }
@@ -245,11 +278,28 @@ FuncStatus writeLine(Line* l, FILE* file, Source from) {
     return UNKNOWN_ERR;
 }
 
+char* _checkCardType(char cardType) {
+    switch (cardType) {
+    case 'S':
+        return "PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR";
+    case 'N':
+        return "PAGAMENTO EM CARTAO E DINHEIRO";
+    case 'F':
+        return "PAGAMENTO EM CARTAO SOMENTE NO FINAL DE SEMANA";
+
+    default:
+        return "ERRO";
+    }
+}
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 FuncStatus printLine(Line* l, LineHeader* lh) {
     if(l->removido == REMOVED) 
         return OK;
-    
+
+    printf("%s: %d\n", lh->descreveCodigo, l->codLinha);
+    printf("%s: %s\n", lh->descreveNome, l->tamanhoNome > 0 ? l->nomeLinha : "campo com valor nulo");
+    printf("%s: %s\n", lh->descreveCor, l->tamanhoCor > 0 ? l->nomeCor : "campo com valor nulo");
+    printf("%s: %s\n\n", lh->descreveCartao, _checkCardType(l->aceitaCartao));
     return OK;
 }
 

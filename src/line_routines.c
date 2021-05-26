@@ -1,7 +1,7 @@
 #include "line_routines.h"
 #include "line.h"
 
-void LinesCsvToBin() {
+void LinesCsvToBin(void) {
     // Getting CSV and BIN filenames
     char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
     scanf("%s %s", csvFileName, binFileName);
@@ -45,28 +45,57 @@ void LinesCsvToBin() {
     binarioNaTela(binFileName);
 }
 
-void printAllLines() {
-    // char binFileName[MAX_STRING_SIZE];
-    // scanf("%s", binFileName);
+void printAllLines(void) {
+    // Getting filename from stdin
+    char binFileName[MAX_STRING_SIZE];
+    scanf("%s", binFileName);
 
-    // FILE* bin = fopen(binFileName, "rb");
-    // if (bin == NULL) {
-    //     printf("Falha no processamento do arquivo.");
-    //     exit(0);
-    // }
+    // Opening file and dealing with errors
+    FILE* bin = fopen(binFileName, "rb");
+    if (bin == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        exit(0);
+    }
 
-    // LineHeader* lh = newLineHeader();
-    // updateLineHeader(lh, bin, BIN);
-    // int n_registers = 0;
+    LineHeader* lh = newLineHeader();
+    updateLineHeader(lh, bin, BIN);
 
-    // Line* l = newLine();
-    // while(updateLine(l, bin, BIN) == OK) 
-    // {
-    //     printLine(l, lh);
-    // }
+    // Checking how many registers there are
+    int nRegisters = getNRegisters(lh);
+    int nRemovedRegisters = getNRemovedRegisters(lh);
 
-    // // Finishing program. Freeing all memory
-    // freeLineHeader(lh);
-    // freeLine(l);
-    // fclose(bin);
+    // If there are no registers, stop the processing and return "Registro inexistente."
+    if (nRegisters == 0) {
+        printf("Registro inexistente.\n");
+        fclose(bin);
+        freeLineHeader(lh);
+
+        exit(0);
+    }
+
+    Line* l = newLine();
+    nRegisters += nRemovedRegisters;
+
+    // Print all registers that aren't logically removed
+    while(nRegisters--) {
+        if (updateLine(l, bin, BIN) != OK) {
+            printf("Falha no processamento do arquivo.\n");
+                freeLineHeader(lh);
+                freeLine(l);
+                fclose(bin);
+                exit(0);
+        }
+
+        printLine(l, lh);
+    }
+
+    // Finishing program. Freeing all memory
+    freeLineHeader(lh);
+    freeLine(l);
+    fclose(bin);
+}
+
+void printSelectedLines(void) {
+
 }

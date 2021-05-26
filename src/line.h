@@ -32,9 +32,12 @@ void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file);
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
 void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
 
-void setLineFileStatus(FILE *file, char c);
+int getNRegisters(LineHeader* lh);
+int getNRemovedRegisters(LineHeader* lh);
 
 void freeLineHeader(LineHeader* lh);
+
+void setLineFileStatus(FILE *file, char c);
 
 /* ## Basic line functions ## */
 
@@ -56,7 +59,7 @@ FuncStatus updateLine(Line* l, FILE* file, Source from);
 
 // Update Line from BIN file using fromByte as offset.
 // If fromByte == CURRENT_POSITION. Ignore any offset and uses current position
-void _updateLineFromBin(Line* l, FILE* bin, int64_t fromByte);
+FuncStatus _updateLineFromBin(Line* l, FILE* bin);
 
 // Update Line from CSV File. Consumes current line in file buffer
 FuncStatus _updateLineFromCSVLine(Line* l, FILE* csv);
