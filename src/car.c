@@ -32,6 +32,16 @@ struct _Car {
 
 /* ## Functions to deal with Car headers ## */
 
+// Gets the sum of active and removed register in the bin file
+int getTotalNumberRegisters(FILE* file)
+{
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, file, BIN);
+    int n = header->nroRegistros + header->nroRegistrosRemovidos;
+    freeCarHeader(header);
+    return n;
+}
+
 // Alocates memory and initializes the struct
 CarHeader* newCarHeader()
 {
@@ -253,7 +263,32 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     return car;
 }
 
-// Reads a car from a source file.
+Car* _readCarFromBIN(Car *car, FILE *file)
+{
+    // if the pointer is pointing at the header, set the pointer for the first car in the file
+    long long position = ftell(file);
+    long long offset = position < STRUCT_CAR_HEADER_SIZE ? STRUCT_CAR_HEADER_SIZE : position;
+    fseek(file, offset, SEEK_SET);
+
+    fread(&car->removido, sizeof(car->removido), 1, file);
+    if(car->removido == REMOVED)
+    {
+        return NULL;
+    }
+    fread(&car->tamanhoRegistro,     sizeof(car->tamanhoRegistro),   1, file);
+    fread(&car->prefixo,             sizeof(car->prefixo),           1, file);
+    fread(&car->data,                sizeof(car->data),              1, file);
+    fread(&car->quantidadeLugares,   sizeof(car->quantidadeLugares), 1, file);
+    fread(&car->codLinha,            sizeof(car->codLinha),          1, file);
+    fread(&car->tamanhoModelo,       sizeof(car->tamanhoModelo),     1, file);
+    fread(&car->modelo,              car->tamanhoModelo,             1, file);
+    fread(&car->tamanhoCategoria,    sizeof(car->tamanhoCategoria),  1, file);
+    fread(&car->categoria,           car->tamanhoCategoria,          1, file);
+    return car;
+}
+
+// Reads a car at the current file pointer from a source file. For bin files, if
+// the pointer is pointing at the header, it will read the first car in the file.
 Car* readCar(Car* car, FILE* file, Source from)
 {
     switch (from)
@@ -261,16 +296,44 @@ Car* readCar(Car* car, FILE* file, Source from)
         case CSV:
             return _readCarFromCSV(car, file);
 
+        case BIN:
+            return _readCarFromBIN(car, file);
+
         default:
             break;
     }
     return NULL;
 }
 
-// Prints Car. Checks if Car is logically removed and also deals with nulls.
-void printCar(Car* c)
+/*
+void _printField(char* fieldName, int fieldNameSize, char* field, int fieldSize)
 {
+    printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
+}
+*/
 
+void printField(CarHeader* header, Car* car, CarField field)
+{
+    char* field = getCarContent(car, field);
+    int fieldSize = getCarContentSize(car, field);
+    char* fieldName = getHeaderDescription(header, field);
+    int fieldNameSize = getCarDescriptionSize(header, field);
+    printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
+}
+
+// Prints Car. Checks if Car is logically removed and also deals with nulls.
+int printCar(Car* car, CarHeader* header)
+{
+    if(car->removido == REMOVED) 
+        return 0;
+
+    _printField(header, car, PREFIXO);
+    _printField(header, car, MODELO);
+    _printField(header, car, CATEGORIA);
+    _printField(header, car, DATA);
+    _printField(header, car, QTD_LUGARES);
+
+    return 1;
 }
 
 // Free all memory associated with a Car
@@ -386,6 +449,118 @@ void writeCar(Car* car, FILE* file, Source from)
 CarField* getCarField(CarHeader ch, char* providedField)
 {
     return NULL;
+}
+
+char* getCarContent(Car* car, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return car->prefixo;
+
+    case DATA:
+        return car->data;
+    
+    case QTD_LUGARES:
+        return car->quantidadeLugares;
+   
+    case COD_LINHA_CAR:
+        return car->codLinha;
+
+    case MODELO:
+        return car->modelo;
+
+    case CATEGORIA:
+        return car->categoria;
+    
+    default:
+        break;
+    }
+    return NULL;
+}
+
+char* getCarContentSize(Car* car, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return sizeof(car->prefixo);
+
+    case DATA:
+        return sizeof(car->data);
+    
+    case QTD_LUGARES:
+        return sizeof(car->quantidadeLugares);
+   
+    case COD_LINHA_CAR:
+        return sizeof(car->codLinha);
+
+    case MODELO:
+        return sizeof(car->modelo);
+
+    case CATEGORIA:
+        return sizeof(car->categoria);
+    
+    default:
+        break;
+    }
+    return 0;
+}
+
+char* getHeaderDescription(CarHeader* header, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return header->descrevePrefixo;
+
+    case DATA:
+        return header->descreveData;
+    
+    case QTD_LUGARES:
+        return header->descreveLugares;
+   
+    case COD_LINHA_CAR:
+        return header->descreveLinha;
+
+    case MODELO:
+        return header->descreveModelo;
+
+    case CATEGORIA:
+        return header->descreveCategoria;
+    
+    default:
+        break;
+    }
+    return NULL;
+}
+
+int getCarDescriptionSize(CarHeader* header, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return sizeof(header->descrevePrefixo);
+
+    case DATA:
+        return sizeof(header->descreveData);
+    
+    case QTD_LUGARES:
+        return sizeof(header->descreveLugares);
+   
+    case COD_LINHA_CAR:
+        return sizeof(header->descreveLinha);
+
+    case MODELO:
+        return sizeof(header->descreveModelo);
+
+    case CATEGORIA:
+        return sizeof(header->descreveCategoria);
+    
+    default:
+        break;
+    }
+    return 0;
 }
 
 // Returns true if a Car's field == searched value

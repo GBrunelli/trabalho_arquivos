@@ -38,3 +38,11 @@ void CarsCsvToBin()
     
     binarioNaTela(binFileName);
 }
+
+void printAllCars()
+{
+    // open the files
+    FILE* bin = fopen("tests/veiculo5.bin", "r"); // TEST
+    
+    
+}
