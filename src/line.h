@@ -37,6 +37,9 @@ void _updateLineHeaderFromBin(LineHeader* lh, FILE* file);
 // Must be first command used on CSV File or will not work.
 void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file);
 
+// Check whether LineHeader status is '1' or '0'
+bool checkFileIntegrity(LineHeader* lh);
+
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
 void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
 
@@ -73,7 +76,7 @@ FuncStatus _updateLineFromBin(Line* l, FILE* bin);
 FuncStatus _updateLineFromCSVLine(Line* l, FILE* csv);
 
 // Update Line from Command Line. Consumes current stdin buffer
-void _updateLineFromCLI(Line* l);
+FuncStatus _updateLineFromCLI(Line* l);
 
 /* ## Functions related to writing lines to different sources ## */
 

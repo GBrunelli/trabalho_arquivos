@@ -31,7 +31,7 @@ int main(void) {
         //InsertNewCarsBin();
         break;
     case 8:
-        //InsertNewLinesBin();
+        InsertNewLinesBin();
         break;
     default:
         break;

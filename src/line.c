@@ -108,6 +108,16 @@ int getNRemovedRegisters(LineHeader* lh) {
     return lh->nroRegistrosRemovidos;
 }
 
+bool checkFileIntegrity(LineHeader* lh) {
+    switch (lh->status)
+    {
+    case '1':
+        return true;
+    default:
+        return false;
+    }
+}
+
 void _overwriteLineHeaderToBin(LineHeader* lh, FILE* file)
 {
     // set the file pointer to the correct position
@@ -222,15 +232,54 @@ FuncStatus _updateLineFromBin(Line* l, FILE* file) {
     return OK;
 }
 
+FuncStatus _updateLineFromCLI(Line* l) {
+    // Initializing zeroed char arrays and then reading from stdinput
+    char codLinha[5] = {0};
+    char aceitaCartao[5] = {0};
+    char nomeLinha[MAX_STRING_SIZE] = {0};
+    char corLinha[MAX_STRING_SIZE] = {0};
+
+    // Scanning and removing possible quotations from each field
+    scan_quote_string(codLinha);
+    scan_quote_string(aceitaCartao);
+    scan_quote_string(nomeLinha);
+    scan_quote_string(corLinha);
+
+    // Checking whether the Line should be considered logically removed
+    if (codLinha[0] == '*') {
+        l->removido = REMOVED;
+        l->codLinha = atoi(&codLinha[1]);
+    } else {
+        l->removido = NOT_REMOVED;
+        l->codLinha = atoi(codLinha);
+    }
+
+    // Checking whether nomeLinha and corLinha are identified as NULO
+    if (isNULO(nomeLinha)) {
+        nomeLinha[0] = '\0';    
+    }
+    if (isNULO(corLinha)) {
+        corLinha[0] = '\0';
+    }
+
+    l->aceitaCartao = aceitaCartao[0];
+    l->tamanhoNome = strlen(nomeLinha);
+    l->tamanhoCor = strlen(corLinha);
+    l->tamanhoRegistro = LINE_OFFSET + l->tamanhoCor + l->tamanhoNome;
+    strcpy(l->nomeLinha, nomeLinha);
+    strcpy(l->nomeCor, corLinha);
+
+    return OK;
+}
+
 FuncStatus updateLine(Line* l, FILE* file, Source from) {
     switch (from) {
     case CSV:
         return _updateLineFromCSVLine(l, file);
-        break;
     case BIN:
         return _updateLineFromBin(l, file);
-    default:
-        break;
+    case CLI:
+        return _updateLineFromCLI(l);
     }
     return UNKNOWN_ERR;
 }
@@ -316,8 +365,7 @@ LineField checkField(char* str) {
 
 LineSearchable searchUsing(LineField lf) {
     char tmp[100];
-    scanf("%s", tmp);
-    removeQuotations(tmp);
+    scan_quote_string(tmp);
 
     LineSearchable s;
     switch (lf) {
@@ -350,6 +398,7 @@ bool checkIfLineMatches(Line* l, LineField lf, LineSearchable search) {
     case COR_LINHA:
         return strcmp(l->nomeCor, search.corLinha) == 0;
     }
+    return UNKNOWN_ERR;
 }
 
 

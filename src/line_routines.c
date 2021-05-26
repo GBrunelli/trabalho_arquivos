@@ -16,7 +16,7 @@ void LinesCsvToBin(void) {
         fclose(csvFile);
         fclose(binFile);
 
-        exit(1);
+        exit(0);
     }
     
     // Writing LineHeader from CSV into Binary file
@@ -60,6 +60,12 @@ void printAllLines(void) {
 
     LineHeader* lh = newLineHeader();
     updateLineHeader(lh, bin, BIN);
+    if (!checkFileIntegrity(lh)) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        freeLineHeader(lh);
+        exit(0);
+    }
 
     // Checking how many registers there are
     int nRegisters = getNRegisters(lh);
@@ -107,9 +113,17 @@ void printSelectedLines(void) {
         exit(0);
     }
 
-    // Checking how many registers there are
+    // Checking file integrity
     LineHeader* lh = newLineHeader();
     updateLineHeader(lh, bin, BIN);
+    if (!checkFileIntegrity(lh)) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        freeLineHeader(lh);
+        exit(0);
+    }
+
+    // Checking how many registers there are
     int nRegisters = getNRegisters(lh);
     int nRemovedRegisters = getNRemovedRegisters(lh);
 
@@ -156,4 +170,52 @@ void printSelectedLines(void) {
     freeLineHeader(lh);
     freeLine(l);
     fclose(bin);
+}
+
+void InsertNewLinesBin(void) {
+    // Getting stdin data for number of new registers and filename
+    int nRegisters = 0;
+    char binFileName[MAX_STRING_SIZE];
+    scanf("%s %d", binFileName, &nRegisters);
+
+    // Opening both src and dest files
+    FILE* binFile = fopen(binFileName, "r+b");
+
+    // Error handling if file didn't open correctly
+    if (binFile == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(binFile);
+        exit(0);
+    }
+
+    // Checking file integrity
+    LineHeader* lh = newLineHeader();
+    updateLineHeader(lh, binFile, BIN);
+    if (!checkFileIntegrity(lh)) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(binFile);
+        freeLineHeader(lh);
+        exit(0);
+    }
+    freeLineHeader(lh);
+
+    
+    // Setting file as INCONSISTENT
+    setLineFileStatus(binFile, STATUS_INCONSISTENT);
+    
+    // Instantiating a Line and then writing all CSV Lines into BIN file
+    fseek(binFile, 0, SEEK_END);
+    Line* l = newLine();
+    while(nRegisters--) {
+        updateLine(l, NULL, CLI);
+        writeLine(l, binFile, BIN);  
+    }
+    freeLine(l);
+
+    // Finishing program. Freeing all memory
+    setLineFileStatus(binFile, STATUS_CONSISTENT);
+    fclose(binFile);
+    
+    // Proof that our program worked correctly
+    binarioNaTela(binFileName);
 }

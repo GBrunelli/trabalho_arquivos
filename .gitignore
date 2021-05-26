@@ -54,6 +54,7 @@ src/car
 *.mod*
 *.cmd
 *.bin
+!copialinha*
 .tmp_versions/
 modules.order
 Module.symvers
