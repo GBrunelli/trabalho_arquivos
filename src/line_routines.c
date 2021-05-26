@@ -6,16 +6,17 @@ void LinesCsvToBin(void) {
     char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
     scanf("%s %s", csvFileName, binFileName);
 
-    // Opening both src and dest files
+    // Opening both src and dest files. Then checking whether they are valid
     FILE* csvFile = fopen(csvFileName, "r");
-    FILE* binFile = fopen(binFileName, "wb+");
+    if (csvFile == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
 
-    // Error handling didn't open
-    if (csvFile == NULL || binFile == NULL) {
+    FILE* binFile = fopen(binFileName, "wb+");
+    if (binFile == NULL) {
         printf("Falha no processamento do arquivo.\n");
         fclose(csvFile);
-        fclose(binFile);
-
         exit(0);
     }
     
@@ -54,7 +55,6 @@ void printAllLines(void) {
     FILE* bin = fopen(binFileName, "rb");
     if (bin == NULL) {
         printf("Falha no processamento do arquivo.\n");
-        fclose(bin);
         exit(0);
     }
 
@@ -76,7 +76,6 @@ void printAllLines(void) {
         printf("Registro inexistente.\n");
         fclose(bin);
         freeLineHeader(lh);
-
         exit(0);
     }
 
@@ -109,7 +108,6 @@ void printSelectedLines(void) {
     FILE* bin = fopen(binFileName, "rb");
     if (bin == NULL) {
         printf("Falha no processamento do arquivo.\n");
-        fclose(bin);
         exit(0);
     }
 
@@ -142,7 +140,7 @@ void printSelectedLines(void) {
     LineSearchable search = searchUsing(field);
     Line* l = newLine();
     int n_matches = 0; // Number of matches
-    FuncStatus status; // Used to check whether a line is removed or not
+    FuncStatus status = OK; // Used to check whether a line is removed or not
 
     // Print lines that match our search.
     while(nRegisters--) {
@@ -184,7 +182,6 @@ void InsertNewLinesBin(void) {
     // Error handling if file didn't open correctly
     if (binFile == NULL) {
         printf("Falha no processamento do arquivo.\n");
-        fclose(binFile);
         exit(0);
     }
 
