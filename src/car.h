@@ -35,7 +35,7 @@ Car* newCar();
 Car* readCar(Car *c, FILE* file, Source From);
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
-void printCar(Car* car, CarHeader* header);
+int printCar(Car* car, CarHeader* header);
 
 // Free all memory associated with a Car
 void freeCar(Car* c);

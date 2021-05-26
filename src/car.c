@@ -311,16 +311,19 @@ void _printField(char* fieldName, int fieldNameSize, char* field, int fieldSize)
 }
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
-void printCar(Car* car, CarHeader* header)
+int printCar(Car* car, CarHeader* header)
 {
-    if(car->removido == REMOVED) return;
-
+    if(car->removido == REMOVED) 
+    {
+        return 0;
+    }
     //          field name                 field name size                    field                   field size
     _printField(header->descrevePrefixo,   sizeof(header->descrevePrefixo),   car->prefixo,           sizeof(car->prefixo));
     _printField(header->descreveModelo,    sizeof(header->descreveModelo),    car->modelo,            car->tamanhoModelo);
     _printField(header->descreveCategoria, sizeof(header->descreveCategoria), car->categoria,         car->tamanhoCategoria);
     _printField(header->descreveData,      sizeof(header->descreveData),      car->data,              sizeof(car->data));
     _printField(header->descreveLugares,   sizeof(header->descreveLugares),   car->quantidadeLugares, sizeof(car->quantidadeLugares));
+    return 1;
 }
 
 // Free all memory associated with a Car
