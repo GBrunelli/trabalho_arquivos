@@ -2,11 +2,13 @@
 
 void CarsCsvToBin()
 {
-    // open the binary file
+    char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
+    scanf("%s %s", csvFileName, binFileName);
 
-    FILE* csv = fopen("tests/veiculo1.csv", "r"); // TEST
-    FILE* bin = fopen("veiculo1.bin", "wb+");
-    
+    // open the binary file
+    FILE* csv = fopen(csvFileName, "r");
+    FILE* bin = fopen(binFileName, "wb+");
+
     // read the header from the csv and write in the bin
     CarHeader* carHeader = newCarHeader();
     getCarHeader(carHeader, csv, CSV);
@@ -33,4 +35,6 @@ void CarsCsvToBin()
     fclose(bin);
     freeCarHeader(carHeader);
     freeCar(car);
+    
+    binarioNaTela(binFileName);
 }

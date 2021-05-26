@@ -7,7 +7,7 @@ void LinesCsvToBin() {
 
     // Opening both src and dest files
     FILE* csvFile = fopen(csvFileName, "r");
-    FILE* binFile = fopen(binFileName, "w+");
+    FILE* binFile = fopen(binFileName, "wb+");
     
     // Writing LineHeader from CSV into Binary file
     LineHeader* lh = newLineHeader();

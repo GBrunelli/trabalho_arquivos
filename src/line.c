@@ -144,7 +144,6 @@ Line* newLine() {
     return l;
 }
 
-// TODO testar isso aqui
 FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
     if (l == NULL) return UNKNOWN_ERR;
     if (file == NULL) return UNKNOWN_ERR;
