@@ -4,5 +4,8 @@ all:
 run:
 	./exec
 
+clear:
+	rm *.bin exec
+
 zip:
 	zip exercicio.zip src/*.c src/*.h Makefile
