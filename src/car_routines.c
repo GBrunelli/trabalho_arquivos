@@ -43,6 +43,21 @@ void printAllCars()
 {
     // open the files
     FILE* bin = fopen("tests/veiculo5.bin", "r"); // TEST
+
+    int n = getTotalNumberRegisters(bin);
+    Car* car = newCar();
+
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, bin, BIN);
     
-    
+    for (int i = 0; i < n; i++)
+    {
+        readCar(car, bin, BIN);
+        if(printCar(car, header))
+            printf("\n");
+    }
+
+    freeCarHeader(header);
+    freeCar(car);
+    fclose(bin);
 }

@@ -270,12 +270,13 @@ Car* _readCarFromBIN(Car *car, FILE *file)
     long long offset = position < STRUCT_CAR_HEADER_SIZE ? STRUCT_CAR_HEADER_SIZE : position;
     fseek(file, offset, SEEK_SET);
 
-    fread(&car->removido, sizeof(car->removido), 1, file);
-    if(car->removido == REMOVED)
+    fread(&car->removido,            sizeof(car->removido),          1, file);
+    fread(&car->tamanhoRegistro,     sizeof(car->tamanhoRegistro),   1, file);
+    if(car->removido == REMOVED) 
     {
+        fseek(file, car->tamanhoRegistro, SEEK_CUR);
         return NULL;
     }
-    fread(&car->tamanhoRegistro,     sizeof(car->tamanhoRegistro),   1, file);
     fread(&car->prefixo,             sizeof(car->prefixo),           1, file);
     fread(&car->data,                sizeof(car->data),              1, file);
     fread(&car->quantidadeLugares,   sizeof(car->quantidadeLugares), 1, file);
@@ -305,20 +306,13 @@ Car* readCar(Car* car, FILE* file, Source from)
     return NULL;
 }
 
-/*
-void _printField(char* fieldName, int fieldNameSize, char* field, int fieldSize)
-{
-    printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
-}
-*/
-
 void printField(CarHeader* header, Car* car, CarField field)
 {
-    char* field = getCarContent(car, field);
-    int fieldSize = getCarContentSize(car, field);
+    char* fieldContent = getCarContent(car, field);
     char* fieldName = getHeaderDescription(header, field);
-    int fieldNameSize = getCarDescriptionSize(header, field);
-    printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
+    printf("%s: %s\n", fieldName, fieldContent);
+    free(fieldContent);
+    free(fieldName);
 }
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
@@ -327,11 +321,11 @@ int printCar(Car* car, CarHeader* header)
     if(car->removido == REMOVED) 
         return 0;
 
-    _printField(header, car, PREFIXO);
-    _printField(header, car, MODELO);
-    _printField(header, car, CATEGORIA);
-    _printField(header, car, DATA);
-    _printField(header, car, QTD_LUGARES);
+    printField(header, car, PREFIXO);
+    printField(header, car, MODELO);
+    printField(header, car, CATEGORIA);
+    printField(header, car, DATA);
+    printField(header, car, QTD_LUGARES);
 
     return 1;
 }
@@ -451,116 +445,174 @@ CarField* getCarField(CarHeader ch, char* providedField)
     return NULL;
 }
 
-char* getCarContent(Car* car, CarField field)
+void getMonthName(char* monthName, int month)
 {
-    switch (field)
+    switch (month)
     {
-    case PREFIXO:
-        return car->prefixo;
+    case 1:
+        strcpy(monthName, "janeiro");
+        break;
 
-    case DATA:
-        return car->data;
-    
-    case QTD_LUGARES:
-        return car->quantidadeLugares;
-   
-    case COD_LINHA_CAR:
-        return car->codLinha;
+    case 2:
+        strcpy(monthName, "fevereiro");
+        break;
 
-    case MODELO:
-        return car->modelo;
+    case 3:
+        strcpy(monthName, "março");
+        break;
 
-    case CATEGORIA:
-        return car->categoria;
+    case 4:
+        strcpy(monthName, "abril");
+        break;
+
+    case 5:
+        strcpy(monthName, "maio");
+        break;
+
+    case 6:
+        strcpy(monthName, "junho");
+        break;
+
+    case 7:
+        strcpy(monthName, "julho");
+        break;
+
+    case 8:
+        strcpy(monthName, "agosto");
+        break;
+
+    case 9:
+        strcpy(monthName, "setembro");
+        break;
+
+    case 10:
+        strcpy(monthName, "outubro");
+        break;
+
+    case 11:
+        strcpy(monthName, "novembro");
+        break;
+
+    case 12:
+        strcpy(monthName, "dezembro");
+        break;    
     
     default:
         break;
     }
-    return NULL;
 }
 
-char* getCarContentSize(Car* car, CarField field)
+void tranformDate(char* date)
 {
+    if(*date == 0)
+    {
+        strcpy(date, NULL_MESSAGE);
+        return;
+    }
+
+    int day, month, year;
+    char* buffer = calloc(MAX_STRING_SIZE, 1);
+    char* bufferPointer = buffer;
+    strcpy(buffer, date);
+    
+    char* token;
+    token = strsep(&buffer, "-");
+    sscanf(token, "%d", &year);
+
+    token = strsep(&buffer, "-");
+    sscanf(token, "%d", &month);
+
+    token = strsep(&buffer, "-");
+    sscanf(token, "%d", &day);
+
+    free(bufferPointer);
+
+    char monthName[15];
+    getMonthName(monthName, month);
+
+    sprintf(date, "%02d de %s de %d", day, monthName, year);
+    return;
+}
+
+char* getCarContent(Car* car, CarField field)
+{
+    char* string = calloc(1, MAX_STRING_SIZE);
     switch (field)
     {
     case PREFIXO:
-        return sizeof(car->prefixo);
+        strncpy(string, car->prefixo, sizeof(car->prefixo));
+        break;
 
     case DATA:
-        return sizeof(car->data);
+        strncpy(string, car->data, sizeof(car->data));
+        tranformDate(string);
+        break;
     
     case QTD_LUGARES:
-        return sizeof(car->quantidadeLugares);
+        snprintf(string, MAX_STRING_SIZE, "%d", car->quantidadeLugares);
+        break;
    
     case COD_LINHA_CAR:
-        return sizeof(car->codLinha);
+        snprintf(string, MAX_STRING_SIZE, "%d", car->codLinha);
+        break;
 
     case MODELO:
-        return sizeof(car->modelo);
+        strncpy(string, car->modelo, car->tamanhoModelo);
+        break;
 
     case CATEGORIA:
-        return sizeof(car->categoria);
+        strncpy(string, car->categoria, car->tamanhoCategoria);
+        break;
     
     default:
-        break;
+        free(string);
+        return NULL;
     }
-    return 0;
+    if(string[0] == 0 || (string[0] == '-' && string[1] == '1'))
+    {
+        strcpy(string, NULL_MESSAGE);
+    }
+    return string;
 }
 
 char* getHeaderDescription(CarHeader* header, CarField field)
 {
+    char* string = calloc(1, MAX_STRING_SIZE);
     switch (field)
     {
     case PREFIXO:
-        return header->descrevePrefixo;
+        strncpy(string, header->descrevePrefixo, sizeof(header->descrevePrefixo));
+        break;
 
     case DATA:
-        return header->descreveData;
+        strncpy(string, header->descreveData, sizeof(header->descreveData));
+        break;
     
     case QTD_LUGARES:
-        return header->descreveLugares;
+        strncpy(string, header->descreveLugares, sizeof(header->descreveLugares));
+        break;
    
     case COD_LINHA_CAR:
-        return header->descreveLinha;
+        strncpy(string, header->descreveLinha, sizeof(header->descreveLinha));
+        break;
 
     case MODELO:
-        return header->descreveModelo;
+        strncpy(string, header->descreveModelo, sizeof(header->descreveModelo));
+        break;
 
     case CATEGORIA:
-        return header->descreveCategoria;
+        strncpy(string, header->descreveCategoria, sizeof(header->descreveCategoria));
+        break;
     
     default:
-        break;
+        free(string);
+        return NULL;
     }
-    return NULL;
-}
-
-int getCarDescriptionSize(CarHeader* header, CarField field)
-{
-    switch (field)
+    if(string[0] == 0 || (string[0] == '-' && string[1] == '1'))
     {
-    case PREFIXO:
-        return sizeof(header->descrevePrefixo);
-
-    case DATA:
-        return sizeof(header->descreveData);
-    
-    case QTD_LUGARES:
-        return sizeof(header->descreveLugares);
-   
-    case COD_LINHA_CAR:
-        return sizeof(header->descreveLinha);
-
-    case MODELO:
-        return sizeof(header->descreveModelo);
-
-    case CATEGORIA:
-        return sizeof(header->descreveCategoria);
-    
-    default:
-        break;
+        strcpy(string, NULL_MESSAGE);
     }
-    return 0;
+    return string;
 }
 
 // Returns true if a Car's field == searched value

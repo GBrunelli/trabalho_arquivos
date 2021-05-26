@@ -64,6 +64,10 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from);
 // Returns CarField representation of struct field found 
 CarField* getCarField(CarHeader ch, char* providedField);
 
+char* getCarContent(Car* car, CarField field);
+
+char* getHeaderDescription(CarHeader* header, CarField field);
+
 // Returns true if a Car's field == searched value
 bool checkCarByField(Car* c, CarField field, char value[100]);
 
