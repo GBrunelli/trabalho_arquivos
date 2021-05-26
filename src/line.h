@@ -15,6 +15,9 @@ typedef struct _Line Line;
 
 /* ## Functions to deal with line headers ## */
 
+// Create a new line header
+LineHeader* newLineHeader();
+
 // Get all Header information from a specific source file. 
 // Currently supported sources: BIN, CSV
 void getLineHeader(LineHeader* lh, FILE* file, Source from);
@@ -29,6 +32,8 @@ void _getLineHeaderFromCSV(LineHeader* lh, FILE* file);
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
 void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
 
+void setLineFileStatus(FILE *file, char c);
+
 void freeLineHeader(LineHeader* lh);
 
 /* ## Basic line functions ## */
@@ -40,21 +45,21 @@ Line* newLine();
 void printLine(Line* l);
 
 // Free all memory associated with a line
-void freeMemLine(Line* l);
+void freeLine(Line* l);
 
 /* ## Functions related to updating lines from different sources. ## */
 
 // Updates a Line with data from a specific source. 
 // Currently supported sources: BIN, CLI, CSV
 // If updating from CLI, file should be NULL.
-void updateLine(Line* l, FILE* file, Source from);
+FuncStatus updateLine(Line* l, FILE* file, Source from);
 
 // Update Line from BIN file using fromByte as offset.
 // If fromByte == CURRENT_POSITION. Ignore any offset and uses current position
 void _updateLineFromBin(Line* l, FILE* bin, int64_t fromByte);
 
 // Update Line from CSV File. Consumes current line in file buffer
-void _updateLineFromCSVLine(Line* l, FILE* csv);
+FuncStatus _updateLineFromCSVLine(Line* l, FILE* csv);
 
 // Update Line from Command Line. Consumes current stdin buffer
 void _updateLineFromCLI(Line* l);
@@ -63,10 +68,10 @@ void _updateLineFromCLI(Line* l);
 
 // Writes a Line to a specific source
 // Currently only supports BIN files.
-void writeLine(Line* l, FILE* file, Source from);
+FuncStatus writeLine(Line* l, FILE* file, Source from);
 
 // Writes Line to end of binary file.
-void _writeLineToBin(Line* l, FILE* bin);
+FuncStatus _writeLineToBin(Line* l, FILE* bin);
 
 /* ## Functions related to searching using a specific struct field ## */
 

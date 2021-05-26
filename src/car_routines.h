@@ -6,7 +6,7 @@
 /* ## CAR ROUTINES ## */
 
 // 1th task -> INSERT ALL
-void CarsCsvToBin(FILE* file, char* binFileName);
+void CarsCsvToBin();
 
 // 3nd task -> SELECT ALL
 void printAllCars();

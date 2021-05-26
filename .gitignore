@@ -1,5 +1,6 @@
 # General
 trabalho.pdf
+*.dump
 
 # Prerequisites
 *.d
