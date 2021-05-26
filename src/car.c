@@ -32,6 +32,16 @@ struct _Car {
 
 /* ## Functions to deal with Car headers ## */
 
+// Gets the sum of active and removed register in the bin file
+int getTotalNumberRegisters(FILE* file)
+{
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, file, BIN);
+    int n = header->nroRegistros + header->nroRegistrosRemovidos;
+    freeCarHeader(header);
+    return n;
+}
+
 // Alocates memory and initializes the struct
 CarHeader* newCarHeader()
 {

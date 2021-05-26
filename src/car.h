@@ -12,6 +12,9 @@ typedef struct _Car Car;
 
 /* ## Functions to deal with Car headers ## */
 
+// Gets the sum of active and removed register in the bin file
+int getTotalNumberRegisters(FILE* file);
+
 // Creates a new reusable CarHeader.
 CarHeader* newCarHeader();
 
