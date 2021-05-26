@@ -27,7 +27,8 @@ void setFileStatus(FILE *file, char c);
 // Creates a new reusable Car.
 Car* newCar();
 
-// Reads a car from a source file.
+// Reads a car at the current file pointer from a source file. For bin files, if
+// the pointer is pointing at the header, it will read the first car in the file.
 Car* readCar(Car *c, FILE* file, Source From);
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
