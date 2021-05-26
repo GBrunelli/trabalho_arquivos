@@ -253,13 +253,41 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     return car;
 }
 
-// Reads a car from a source file.
+Car* _readCarFromBIN(Car *car, FILE *file)
+{
+    // if the pointer is pointing at the header, set the pointer for the first car in the file
+    long long position = ftell(file);
+    long long offset = position < STRUCT_CAR_HEADER_SIZE ? STRUCT_CAR_HEADER_SIZE : position;
+    fseek(file, offset, SEEK_SET);
+
+    fread(&car->removido, sizeof(car->removido), 1, file);
+    if(car->removido == REMOVED)
+    {
+        return NULL;
+    }
+    fread(&car->tamanhoRegistro,     sizeof(car->tamanhoRegistro),   1, file);
+    fread(&car->prefixo,             sizeof(car->prefixo),           1, file);
+    fread(&car->data,                sizeof(car->data),              1, file);
+    fread(&car->quantidadeLugares,   sizeof(car->quantidadeLugares), 1, file);
+    fread(&car->codLinha,            sizeof(car->codLinha),          1, file);
+    fread(&car->tamanhoModelo,       sizeof(car->tamanhoModelo),     1, file);
+    fread(&car->modelo,              car->tamanhoModelo,             1, file);
+    fread(&car->tamanhoCategoria,    sizeof(car->tamanhoCategoria),  1, file);
+    fread(&car->categoria,           car->tamanhoCategoria,          1, file);
+    return car;
+}
+
+// Reads a car at the current file pointer from a source file. For bin files, if
+// the pointer is pointing at the header, it will read the first car in the file.
 Car* readCar(Car* car, FILE* file, Source from)
 {
     switch (from)
     {
         case CSV:
             return _readCarFromCSV(car, file);
+
+        case BIN:
+            return _readCarFromBIN(car, file);
 
         default:
             break;

@@ -32,3 +32,11 @@ void CarsCsvToBin(FILE* csv, char* binFileName)
     freeCarHeader(carHeader);
     freeCar(car);
 }
+
+void printAllCars()
+{
+    // open the files
+    FILE* bin = fopen("tests/veiculo5.bin", "r"); // TEST
+    
+    
+}
