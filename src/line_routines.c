@@ -8,6 +8,13 @@ void LinesCsvToBin() {
     // Opening both src and dest files
     FILE* csvFile = fopen(csvFileName, "r");
     FILE* binFile = fopen(binFileName, "wb+");
+    if (csvFile == NULL || binFile == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(csvFile);
+        fclose(binFile);
+
+        exit(1);
+    }
     
     // Writing LineHeader from CSV into Binary file
     LineHeader* lh = newLineHeader();
