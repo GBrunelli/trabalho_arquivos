@@ -305,8 +305,19 @@ Car* readCar(Car* car, FILE* file, Source from)
     return NULL;
 }
 
+/*
 void _printField(char* fieldName, int fieldNameSize, char* field, int fieldSize)
 {
+    printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
+}
+*/
+
+void printField(CarHeader* header, Car* car, CarField field)
+{
+    char* field = getCarContent(car, field);
+    int fieldSize = getCarContentSize(car, field);
+    char* fieldName = getHeaderDescription(header, field);
+    int fieldNameSize = getCarDescriptionSize(header, field);
     printf("(%.*s): (%.*s)\n", fieldNameSize, fieldName, fieldSize, field);
 }
 
@@ -314,15 +325,14 @@ void _printField(char* fieldName, int fieldNameSize, char* field, int fieldSize)
 int printCar(Car* car, CarHeader* header)
 {
     if(car->removido == REMOVED) 
-    {
         return 0;
-    }
-    //          field name                 field name size                    field                   field size
-    _printField(header->descrevePrefixo,   sizeof(header->descrevePrefixo),   car->prefixo,           sizeof(car->prefixo));
-    _printField(header->descreveModelo,    sizeof(header->descreveModelo),    car->modelo,            car->tamanhoModelo);
-    _printField(header->descreveCategoria, sizeof(header->descreveCategoria), car->categoria,         car->tamanhoCategoria);
-    _printField(header->descreveData,      sizeof(header->descreveData),      car->data,              sizeof(car->data));
-    _printField(header->descreveLugares,   sizeof(header->descreveLugares),   car->quantidadeLugares, sizeof(car->quantidadeLugares));
+
+    _printField(header, car, PREFIXO);
+    _printField(header, car, MODELO);
+    _printField(header, car, CATEGORIA);
+    _printField(header, car, DATA);
+    _printField(header, car, QTD_LUGARES);
+
     return 1;
 }
 
@@ -439,6 +449,118 @@ void writeCar(Car* car, FILE* file, Source from)
 CarField* getCarField(CarHeader ch, char* providedField)
 {
     return NULL;
+}
+
+char* getCarContent(Car* car, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return car->prefixo;
+
+    case DATA:
+        return car->data;
+    
+    case QTD_LUGARES:
+        return car->quantidadeLugares;
+   
+    case COD_LINHA_CAR:
+        return car->codLinha;
+
+    case MODELO:
+        return car->modelo;
+
+    case CATEGORIA:
+        return car->categoria;
+    
+    default:
+        break;
+    }
+    return NULL;
+}
+
+char* getCarContentSize(Car* car, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return sizeof(car->prefixo);
+
+    case DATA:
+        return sizeof(car->data);
+    
+    case QTD_LUGARES:
+        return sizeof(car->quantidadeLugares);
+   
+    case COD_LINHA_CAR:
+        return sizeof(car->codLinha);
+
+    case MODELO:
+        return sizeof(car->modelo);
+
+    case CATEGORIA:
+        return sizeof(car->categoria);
+    
+    default:
+        break;
+    }
+    return 0;
+}
+
+char* getHeaderDescription(CarHeader* header, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return header->descrevePrefixo;
+
+    case DATA:
+        return header->descreveData;
+    
+    case QTD_LUGARES:
+        return header->descreveLugares;
+   
+    case COD_LINHA_CAR:
+        return header->descreveLinha;
+
+    case MODELO:
+        return header->descreveModelo;
+
+    case CATEGORIA:
+        return header->descreveCategoria;
+    
+    default:
+        break;
+    }
+    return NULL;
+}
+
+int getCarDescriptionSize(CarHeader* header, CarField field)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return sizeof(header->descrevePrefixo);
+
+    case DATA:
+        return sizeof(header->descreveData);
+    
+    case QTD_LUGARES:
+        return sizeof(header->descreveLugares);
+   
+    case COD_LINHA_CAR:
+        return sizeof(header->descreveLinha);
+
+    case MODELO:
+        return sizeof(header->descreveModelo);
+
+    case CATEGORIA:
+        return sizeof(header->descreveCategoria);
+    
+    default:
+        break;
+    }
+    return 0;
 }
 
 // Returns true if a Car's field == searched value
