@@ -8,10 +8,10 @@
 // 2th task -> INSERT ALL
 void LinesCsvToBin();
 
-// 4nd task -> SELECT ALL
+// 4th task -> SELECT ALL
 void printAllLines();
 
-// 6rd task -> SELECT WHERE Campo = Valor
+// 6th task -> SELECT WHERE Campo = Valor
 void printSelectedLines();
 
 // 8th task -> INSERT N REGISTERS INTO END

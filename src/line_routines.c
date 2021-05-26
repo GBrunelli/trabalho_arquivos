@@ -21,7 +21,7 @@ void LinesCsvToBin() {
     
     // Writing LineHeader from CSV into Binary file
     LineHeader* lh = newLineHeader();
-    getLineHeader(lh, csvFile, CSV);
+    updateLineHeader(lh, csvFile, CSV);
     overwriteLineHeader(lh, binFile, BIN);
     freeLineHeader(lh);
 
@@ -43,4 +43,30 @@ void LinesCsvToBin() {
     
     // Proof that our program worked correctly
     binarioNaTela(binFileName);
+}
+
+void printAllLines() {
+    // char binFileName[MAX_STRING_SIZE];
+    // scanf("%s", binFileName);
+
+    // FILE* bin = fopen(binFileName, "rb");
+    // if (bin == NULL) {
+    //     printf("Falha no processamento do arquivo.");
+    //     exit(0);
+    // }
+
+    // LineHeader* lh = newLineHeader();
+    // updateLineHeader(lh, bin, BIN);
+    // int n_registers = 0;
+
+    // Line* l = newLine();
+    // while(updateLine(l, bin, BIN) == OK) 
+    // {
+    //     printLine(l, lh);
+    // }
+
+    // // Finishing program. Freeing all memory
+    // freeLineHeader(lh);
+    // freeLine(l);
+    // fclose(bin);
 }

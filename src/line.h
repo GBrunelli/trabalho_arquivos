@@ -20,14 +20,14 @@ LineHeader* newLineHeader();
 
 // Get all Header information from a specific source file. 
 // Currently supported sources: BIN, CSV
-void getLineHeader(LineHeader* lh, FILE* file, Source from);
+void updateLineHeader(LineHeader* lh, FILE* file, Source from);
 
 // Generates a LineHeader from a valid binary file. 
-void _getLineHeaderFromBin(LineHeader* lh, FILE* file);
+void _updateLineHeaderFromBin(LineHeader* lh, FILE* file);
 
 // Generates a LineHeader from a valid CSV file. 
 // Must be first command used on CSV File or will not work.
-void _getLineHeaderFromCSV(LineHeader* lh, FILE* file);
+void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file);
 
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
 void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
@@ -42,7 +42,7 @@ void freeLineHeader(LineHeader* lh);
 Line* newLine();
 
 // Prints Line. Checks if Line is logically removed and also deals with nulls.
-void printLine(Line* l);
+FuncStatus printLine(Line* l, LineHeader* lh);
 
 // Free all memory associated with a line
 void freeLine(Line* l);

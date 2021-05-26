@@ -24,37 +24,43 @@ struct _LineHeader {
     int64_t byteProxReg;
     int32_t nroRegistros;
     int32_t nroRegistrosRemovidos;
-    char descreveCodigo[DESCREVECODIGO_SIZE];
-    char descreveCartao[DESCREVECARTAO_SIZE];
-    char descreveNome[DESCREVENOME_SIZE];
-    char descreveCor[DESCREVECOR_SIZE];
+    char descreveCodigo[DESCREVECODIGO_SIZE + 1];
+    char descreveCartao[DESCREVECARTAO_SIZE + 1];
+    char descreveNome[DESCREVENOME_SIZE + 1];
+    char descreveCor[DESCREVECOR_SIZE + 1];
 };
 
 
 LineHeader* newLineHeader()
 {
     LineHeader* lh = calloc(1, sizeof(LineHeader));
-    lh->status = 0;
+    lh->status = '0';
     lh->nroRegistros = 0;
     lh->nroRegistrosRemovidos = 0;
     lh->byteProxReg = LINE_HEADER_OFFSET;
+
+    lh->descreveCodigo[DESCREVECODIGO_SIZE] = '\0';
+    lh->descreveCartao[DESCREVECARTAO_SIZE] = '\0';
+    lh->descreveNome[DESCREVENOME_SIZE] = '\0';
+    lh->descreveCor[DESCREVECOR_SIZE] = '\0';
+    
     return lh;
 }
 
-void _getLineHeaderFromBin(LineHeader* lh, FILE* file) {
+void _updateLineHeaderFromBin(LineHeader* lh, FILE* file) {
     fseek(file, 0, SEEK_SET);
 
     fread(&lh->status, sizeof(lh->status), 1, file);
     fread(&lh->byteProxReg, sizeof(lh->byteProxReg), 1, file);
     fread(&lh->nroRegistros, sizeof(lh->nroRegistros), 1, file);
     fread(&lh->nroRegistrosRemovidos, sizeof(lh->nroRegistrosRemovidos), 1, file);
-    fread(&lh->descreveCodigo, sizeof(lh->descreveCodigo), 1, file);
-    fread(&lh->descreveCartao, sizeof(lh->descreveCartao), 1, file);
-    fread(&lh->descreveNome, sizeof(lh->descreveNome), 1, file);
-    fread(&lh->descreveCor, sizeof(lh->descreveCor), 1, file);
+    fread(&lh->descreveCodigo, DESCREVECODIGO_SIZE, 1, file);
+    fread(&lh->descreveCartao, DESCREVECARTAO_SIZE, 1, file);
+    fread(&lh->descreveNome, DESCREVENOME_SIZE, 1, file);
+    fread(&lh->descreveCor, DESCREVECOR_SIZE, 1, file);
 }
 
-void _getLineHeaderFromCSV(LineHeader* lh, FILE* file) {
+void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file) {
     // set the pointer to the start of the file
     fseek(file, 0, SEEK_SET);
 
@@ -79,15 +85,15 @@ void _getLineHeaderFromCSV(LineHeader* lh, FILE* file) {
     free(buffer_pointer);
 }
 
-void getLineHeader(LineHeader* LineHeader, FILE* file, Source from)
+void updateLineHeader(LineHeader* LineHeader, FILE* file, Source from)
 {
     switch (from)
     {
         case CSV:
-            _getLineHeaderFromCSV(LineHeader, file);
+            _updateLineHeaderFromCSV(LineHeader, file);
             break;
         case BIN:
-            _getLineHeaderFromBin(LineHeader, file);
+            _updateLineHeaderFromBin(LineHeader, file);
             break;
         default:
             break;
@@ -104,10 +110,10 @@ void _overwriteLineHeaderToBin(LineHeader* lh, FILE* file)
     fwrite(&lh->byteProxReg, sizeof(lh->byteProxReg), 1, file);
     fwrite(&lh->nroRegistros, sizeof(lh->nroRegistros), 1, file);
     fwrite(&lh->nroRegistrosRemovidos, sizeof(lh->nroRegistrosRemovidos), 1, file);
-    fwrite(&lh->descreveCodigo, sizeof(lh->descreveCodigo), 1, file);
-    fwrite(&lh->descreveCartao, sizeof(lh->descreveCartao), 1, file);
-    fwrite(&lh->descreveNome, sizeof(lh->descreveNome), 1, file);
-    fwrite(&lh->descreveCor, sizeof(lh->descreveCor), 1, file);  
+    fwrite(&lh->descreveCodigo, DESCREVECODIGO_SIZE, 1, file);
+    fwrite(&lh->descreveCartao, DESCREVECARTAO_SIZE, 1, file);
+    fwrite(&lh->descreveNome, DESCREVENOME_SIZE, 1, file);
+    fwrite(&lh->descreveCor, DESCREVECOR_SIZE, 1, file);
 }
 
 
@@ -129,7 +135,7 @@ void setLineFileStatus(FILE *file, char c)
     if(c == REMOVED || c == NOT_REMOVED)
     {
         LineHeader* lh = newLineHeader();
-        getLineHeader(lh, file, BIN);
+        updateLineHeader(lh, file, BIN);
         lh->status = c;
         overwriteLineHeader(lh, file, BIN);
         freeLineHeader(lh);
@@ -199,7 +205,7 @@ FuncStatus updateLine(Line* l, FILE* file, Source from) {
 FuncStatus _writeLineToBin(Line* l, FILE* file) {
     // gets the information from the header and update it
     LineHeader* lh = newLineHeader();
-    getLineHeader(lh, file, BIN);
+    updateLineHeader(lh, file, BIN);
 
     int byteOffset = lh->byteProxReg;
     lh->byteProxReg += l->tamanhoRegistro + sizeof(l->removido) + sizeof(l->tamanhoRegistro);
@@ -240,8 +246,11 @@ FuncStatus writeLine(Line* l, FILE* file, Source from) {
 }
 
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
-void printLine(Line* l) {
-
+FuncStatus printLine(Line* l, LineHeader* lh) {
+    if(l->removido == REMOVED) 
+        return OK;
+    
+    return OK;
 }
 
 

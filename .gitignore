@@ -1,6 +1,7 @@
 # General
 trabalho.pdf
 *.dump
+src/car
 
 # Prerequisites
 *.d
