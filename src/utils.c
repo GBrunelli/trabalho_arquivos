@@ -1,5 +1,19 @@
 #include "utils.h"
 
+// Remove "Quotation Marks" from a string. 
+void removeQuotations(char* str) {
+    // Checking whether string has quotation marks
+    if (str[0] != '"')
+        return;
+
+    int len = strlen(str);
+    for (int i = 1; i < len; i++) {
+        str[i - 1] = str[i];
+    }    
+    
+    str[len - 2] = '\0';
+}
+
 // Shifts a string to left.
 void leftShift(char *string, int len)
 {

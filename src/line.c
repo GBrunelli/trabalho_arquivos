@@ -294,13 +294,62 @@ char* _checkCardType(char cardType) {
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 FuncStatus printLine(Line* l, LineHeader* lh) {
     if(l->removido == REMOVED) 
-        return OK;
+        return LOGICALLY_REMOVED;
 
     printf("%s: %d\n", lh->descreveCodigo, l->codLinha);
     printf("%s: %s\n", lh->descreveNome, l->tamanhoNome > 0 ? l->nomeLinha : "campo com valor nulo");
     printf("%s: %s\n", lh->descreveCor, l->tamanhoCor > 0 ? l->nomeCor : "campo com valor nulo");
     printf("%s: %s\n\n", lh->descreveCartao, _checkCardType(l->aceitaCartao));
     return OK;
+}
+
+LineField checkField(char* str) {
+    if (strcmp(str, "codLinha") == 0)
+        return COD_LINHA;
+    if (strcmp(str, "aceitaCartao") == 0)
+        return ACEITA_CARTAO;
+    if (strcmp(str, "nomeLinha") == 0)
+        return NOME_LINHA;
+
+    return COR_LINHA;
+}
+
+LineSearchable searchUsing(LineField lf) {
+    char tmp[100];
+    scanf("%s", tmp);
+    removeQuotations(tmp);
+
+    LineSearchable s;
+    switch (lf) {
+    case COD_LINHA:
+        s.codLinha = atoi(tmp);
+        break;
+    case ACEITA_CARTAO:
+        s.aceitaCartao = tmp[0];
+        break;
+    case NOME_LINHA:
+        strcpy(s.nomeLinha, tmp);
+        break;
+    case COR_LINHA:
+        strcpy(s.corLinha, tmp);
+        break;
+    }
+    
+    return s;
+}
+
+bool checkIfLineMatches(Line* l, LineField lf, LineSearchable search) {
+    switch (lf)
+    {
+    case COD_LINHA:
+        return l->codLinha == search.codLinha;
+    case ACEITA_CARTAO:
+        return l->aceitaCartao == search.aceitaCartao;
+    case NOME_LINHA:
+        return strcmp(l->nomeLinha, search.nomeLinha) == 0;
+    case COR_LINHA:
+        return strcmp(l->nomeCor, search.corLinha) == 0;
+    }
 }
 
 

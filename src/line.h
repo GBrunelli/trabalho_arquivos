@@ -7,7 +7,15 @@
 // Use current file position instead of a specific offset.
 #define CURRENT_POSITION -11
 
-typedef enum _LineField { COD_LINHA, ACEITA_CARTAO, LINHA, COR } LineField;
+typedef enum _LineField { COD_LINHA, ACEITA_CARTAO, NOME_LINHA, COR_LINHA } LineField;
+
+typedef union _LineSearchable {
+    int32_t codLinha;
+    char aceitaCartao;
+    char nomeLinha[MAX_STRING_SIZE];
+    char corLinha[MAX_STRING_SIZE];
+} LineSearchable;
+
 
 typedef struct _LineHeader LineHeader;
 
@@ -78,11 +86,10 @@ FuncStatus _writeLineToBin(Line* l, FILE* bin);
 
 /* ## Functions related to searching using a specific struct field ## */
 
-// Checks what struct field to use in search, 
-// Returns LineField representation of struct field found 
-LineField getLineField(LineHeader lh, char* providedField);
+LineField checkField(char* str) ;
 
-// Returns true if a line's field == searched value
-bool checkLineByField(Line* l, LineField field, char value[100]);
+LineSearchable searchUsing(LineField lf);
+
+bool checkIfLineMatches(Line* l, LineField field, LineSearchable search);
 
 #endif
