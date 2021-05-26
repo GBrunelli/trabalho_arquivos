@@ -7,7 +7,7 @@ void LinesCsvToBin() {
 
     // Opening both src and dest files
     FILE* csvFile = fopen(csvFileName, "r");
-    FILE* binFile = fopen(binFileName, "rw");
+    FILE* binFile = fopen(binFileName, "w+");
     
     // Writing LineHeader from CSV into Binary file
     LineHeader* lh = newLineHeader();
@@ -25,10 +25,10 @@ void LinesCsvToBin() {
         writeLine(l, binFile, BIN); // write the car in the bin 
     }
     freeLine(l);
-
     fclose(csvFile);
+    
     setLineFileStatus(binFile, STATUS_CONSISTENT);
-
-    binarioNaTela(binFileName);
     fclose(binFile);
+    
+    binarioNaTela(binFileName);
 }

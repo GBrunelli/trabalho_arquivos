@@ -1,9 +1,13 @@
 #include "line.h"
 #include "utils.h"
 
-#define LINE_HEADER_OFFSET 83
+#define LINE_HEADER_OFFSET 82
 #define LINE_OFFSET 13
 
+#define DESCREVECODIGO_SIZE 15
+#define DESCREVECARTAO_SIZE 13
+#define DESCREVENOME_SIZE 13
+#define DESCREVECOR_SIZE 24
 struct _Line {
     int8_t removido;
     int32_t tamanhoRegistro;
@@ -20,11 +24,12 @@ struct _LineHeader {
     int64_t byteProxReg;
     int32_t nroRegistros;
     int32_t nroRegistrosRemovidos;
-    char descreveCodigo[15];
-    char descreveCartao[13];
-    char descreveNome[13];
-    char descreveCor[24];
+    char descreveCodigo[DESCREVECODIGO_SIZE];
+    char descreveCartao[DESCREVECARTAO_SIZE];
+    char descreveNome[DESCREVENOME_SIZE];
+    char descreveCor[DESCREVECOR_SIZE];
 };
+
 
 LineHeader* newLineHeader()
 {
@@ -60,16 +65,16 @@ void _getLineHeaderFromCSV(LineHeader* lh, FILE* file) {
 
     // get each column
     char* token = strsep(&buffer, ",");
-    strcpy(lh->descreveCodigo, token);
+    strncpy(lh->descreveCodigo, token, DESCREVECODIGO_SIZE);
 
     token = strsep(&buffer, ",");
-    strcpy(lh->descreveCartao, token);
+    strncpy(lh->descreveCartao, token, DESCREVECARTAO_SIZE);
 
     token = strsep(&buffer, ",");
-    strcpy(lh->descreveNome, token);
+    strncpy(lh->descreveNome, token, DESCREVENOME_SIZE);
 
     token = strsep(&buffer, ",");
-    strcpy(lh->descreveCor, token);
+    strncpy(lh->descreveCor, token, DESCREVECOR_SIZE);
 
     free(buffer_pointer);
 }
@@ -80,8 +85,10 @@ void getLineHeader(LineHeader* LineHeader, FILE* file, Source from)
     {
         case CSV:
             _getLineHeaderFromCSV(LineHeader, file);
+            break;
         case BIN:
             _getLineHeaderFromBin(LineHeader, file);
+            break;
         default:
             break;
     }
@@ -147,19 +154,28 @@ FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
     char aceitaCartao[2] = {0};
     char nomeLinha[MAX_STRING_SIZE] = {0};
     char corLinha[MAX_STRING_SIZE] = {0};
-    fscanf(file, "%[^,],%[^,]%[^,]%[^\n]%*c", codLinha, aceitaCartao, nomeLinha, corLinha);
+    
+    if (fscanf(file, "%[^,],%[^,],%[^,],%[^\n]%*c", codLinha, aceitaCartao, nomeLinha, corLinha) != 4)
+        return EOF_OR_MALFORMED;
 
     // Logically removed Lines start with *. Checking whether current line is logically removed.
     if (codLinha[0] == '*') {
         l->removido = REMOVED;
+        l->codLinha = atoi(&codLinha[1]);
+    } else {
+        l->removido = NOT_REMOVED;
+        l->codLinha = atoi(codLinha);
     }
 
     // Setting fixed size parameters
-    l->codLinha = atoi(codLinha + (l->removido == REMOVED ? 4 : 0));
     l->aceitaCartao = aceitaCartao[0];
 
     // Setting variable sized parameters and their sizes
-    // ! FALTA CHECAR SE O VALOR É NULO???
+    if (isNULO(nomeLinha))
+        nomeLinha[0] = '\0';
+    if (isNULO(corLinha))
+        corLinha[0] = '\0';
+    
     l->tamanhoNome = strlen(nomeLinha);
     l->tamanhoCor = strlen(corLinha);
     l->tamanhoRegistro = LINE_OFFSET + l->tamanhoCor + l->tamanhoNome;

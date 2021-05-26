@@ -23,7 +23,7 @@ typedef enum _DataType { CAR, LINE } DataType;
 
 // Results from functions.
 // Can be: Errors, Incomplete Results, OK, etc...
-typedef enum _FuncStatus { UNKNOWN_ERR, OK } FuncStatus;
+typedef enum _FuncStatus { UNKNOWN_ERR, OK, EOF_OR_MALFORMED } FuncStatus;
 
 
 
