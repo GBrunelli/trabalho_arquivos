@@ -171,7 +171,12 @@ void setFileStatus(FILE *file, char c)
     }
 }
 
-
+int checkCarFileIntegrity(CarHeader* header)
+{
+    if(header->status == STATUS_CONSISTENT)
+        return 1;
+    return 0;
+}
 
 /* ## Basic Car functions ## */
 
@@ -288,6 +293,77 @@ Car* _readCarFromBIN(Car *car, FILE *file)
     return car;
 }
 
+Car* _readCarFromCLI(Car *car)
+{
+    // Initializing zeroed char arrays and then reading from stdinput
+    char prefixo[5] = {0};
+    char data[10] = {0};
+    char quantidadeLugares[MAX_STRING_SIZE] = {0};
+    char codLinha[MAX_STRING_SIZE] = {0};
+    char modelo[MAX_STRING_SIZE] = {0};
+    char categoria[MAX_STRING_SIZE] = {0};
+
+    // Scanning and removing possible quotations from each field
+    scan_quote_string(prefixo);
+    scan_quote_string(data);
+    scan_quote_string(quantidadeLugares);
+    scan_quote_string(codLinha);
+    scan_quote_string(modelo);
+    scan_quote_string(categoria);
+
+    strncpy(car->prefixo, prefixo, sizeof(car->prefixo));
+
+    // DATA
+    if(data[0] == 0)
+        fillWithGarbage(car->data, sizeof(car->data));
+    else
+        strncpy(car->data, data, sizeof(car->data));     
+    
+    // QUANTIDADE DE LUGARES
+    if(*quantidadeLugares == 0)
+        car->quantidadeLugares = -1;
+    else
+        sscanf(quantidadeLugares, "%d", &car->quantidadeLugares);
+
+    // COD LINHA
+    if(*codLinha == 0)
+        car->codLinha = -1;
+    else
+        sscanf(codLinha, "%d", &car->codLinha);
+
+    // MODELO
+    if(*modelo == 0)
+        fillWithGarbage(car->modelo, sizeof(car->modelo));
+    else
+        strncpy(car->modelo, modelo, sizeof(car->modelo));    
+
+    // CATEGORIA
+    if(*categoria == 0)
+        fillWithGarbage(car->categoria, sizeof(car->categoria));
+    else
+        strncpy(car->categoria, categoria, sizeof(car->categoria));      
+
+    // verify if the register is removed
+    if(car->prefixo[0] == '*')
+    {
+        car->removido = REMOVED;
+        leftShift(car->prefixo, 5);
+    }
+    else 
+        car->removido = NOT_REMOVED;
+
+    // calculates the lenght of car->modelo and car->categoria
+    int lenghtModelo = strlen(car->modelo);
+    int lenghtCategoria = strlen(car->categoria);
+    car->tamanhoModelo = lenghtModelo;
+    car->tamanhoCategoria = lenghtCategoria;
+
+    // calculates the size of the register
+    car->tamanhoRegistro = STRUCT_BASE_CAR_SIZE + lenghtModelo + lenghtCategoria;
+    
+    return car;
+}
+
 // Reads a car at the current file pointer from a source file. For bin files, if
 // the pointer is pointing at the header, it will read the first car in the file.
 Car* readCar(Car* car, FILE* file, Source from)
@@ -299,6 +375,9 @@ Car* readCar(Car* car, FILE* file, Source from)
 
         case BIN:
             return _readCarFromBIN(car, file);
+
+        case CLI:
+            return _readCarFromCLI(car);
 
         default:
             break;

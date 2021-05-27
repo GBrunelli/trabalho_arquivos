@@ -33,6 +33,8 @@ CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from);
 // Set the status of a file as consistent '1' or inconsistent '0'
 void setFileStatus(FILE *file, char c);
 
+int checkCarFileIntegrity(CarHeader* header);
+
 /* ## Basic Car functions ## */
 
 // Creates a new reusable Car.

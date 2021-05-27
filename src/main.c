@@ -28,7 +28,7 @@ int main(void) {
         printSelectedLines();
         break;
     case 7:
-        //InsertNewCarsBin();
+        InsertNewCarsBin();
         break;
     case 8:
         InsertNewLinesBin();

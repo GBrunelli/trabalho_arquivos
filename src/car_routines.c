@@ -95,3 +95,43 @@ void printSelectedCars()
     freeCar(car);
     fclose(bin);
 }
+
+void InsertNewCarsBin()
+{
+    // Getting stdin data for number of new registers and filename
+    int nRegisters = 0;
+    char binFileName[MAX_STRING_SIZE];
+    scanf("%s %d", binFileName, &nRegisters);
+
+    // Opening both src and dest files
+    FILE* bin = fopen(binFileName, "r+b");
+
+    // Checking file integrity
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, bin, BIN);
+    if (!checkCarFileIntegrity(header)) {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        freeCarHeader(header);
+        exit(0);
+    }
+    freeCarHeader(header);
+    
+    // Setting file as INCONSISTENT
+    setFileStatus(bin, STATUS_INCONSISTENT);
+
+    // Instantiating a Line and then writing all CSV Lines into BIN file
+    Car* car = newCar();
+    while(nRegisters--) {
+        readCar(car, NULL, CLI);
+        writeCar(car, bin, BIN);  
+    }
+    freeCar(car);
+
+    // Finishing program. Freeing all memory
+    setFileStatus(bin, STATUS_CONSISTENT);
+    fclose(bin);
+    
+    // Proof that our program worked correctly
+    binarioNaTela(binFileName);
+}
