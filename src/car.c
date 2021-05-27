@@ -440,9 +440,33 @@ void writeCar(Car* car, FILE* file, Source from)
 
 // Checks what struct field to use in search, 
 // Returns CarField representation of struct field found 
-CarField* getCarField(CarHeader ch, char* providedField)
+CarField getCarField(char* providedField)
 {
-    return NULL;
+    if(!strcmp(providedField, "prefixo"))
+    {
+        return PREFIXO;
+    }
+    if(!strcmp(providedField, "data"))
+    {
+        return DATA;
+    }
+    if(!strcmp(providedField, "quantidadeLugares"))
+    {
+        return QTD_LUGARES;
+    }
+    if(!strcmp(providedField, "linha"))
+    {
+        return COD_LINHA_CAR;
+    }
+    if(!strcmp(providedField, "modelo"))
+    {
+        return MODELO;
+    }
+    if(!strcmp(providedField, "categoria"))
+    {
+        return CATEGORIA;
+    }
+    return 0;
 }
 
 void getMonthName(char* monthName, int month)
@@ -615,8 +639,64 @@ char* getHeaderDescription(CarHeader* header, CarField field)
     return string;
 }
 
-// Returns true if a Car's field == searched value
-bool checkCarByField(Car* c, CarField field, char* value)
+CarSearchable CarSearchUsing(CarField field)
 {
-    return NULL;
+    char tmp[MAX_STRING_SIZE];
+    scan_quote_string(tmp);
+
+    CarSearchable cs;
+    switch (field)
+    {
+    case PREFIXO:
+        strncpy(cs.prefixo, tmp, sizeof(cs.prefixo));
+        break;
+
+    case DATA:
+        strncpy(cs.data, tmp, sizeof(cs.data));
+        break;
+    
+    case QTD_LUGARES:
+        cs.quantidadeLugares = atoi(tmp);
+        break;
+
+    case MODELO:
+        strncpy(cs.modelo, tmp, sizeof(cs.modelo));
+        break;
+
+    case CATEGORIA:
+        strncpy(cs.categoria, tmp, sizeof(cs.categoria));
+        break;
+    
+    default:
+        break;
+    }
+    
+    return cs;
 }
+
+bool checkIfCarMatches(Car* car, CarField field, CarSearchable search)
+{
+    switch (field)
+    {
+    case PREFIXO:
+        return !strcmp(car->prefixo, search.prefixo);
+
+    case DATA:
+        return !strcmp(car->data, search.data);
+    
+    case QTD_LUGARES:
+        return car->quantidadeLugares == search.quantidadeLugares;
+
+    case MODELO:
+        return !strcmp(car->modelo, search.modelo);
+
+    case CATEGORIA:
+        return !strcmp(car->categoria, search.categoria);
+    
+    default:
+        break;
+    }
+
+    return UNKNOWN_ERR;
+}
+

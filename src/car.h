@@ -10,6 +10,14 @@ typedef struct _CarHeader CarHeader;
 
 typedef struct _Car Car;
 
+typedef union _CarSearchable {
+    char prefixo[5];
+    char data[10];
+    int32_t quantidadeLugares;
+    char modelo[MAX_STRING_SIZE];
+    char categoria[MAX_STRING_SIZE];
+} CarSearchable;
+
 /* ## Functions to deal with Car headers ## */
 
 // Gets the sum of active and removed register in the bin file
@@ -62,13 +70,14 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from);
 
 // Checks what struct field to use in search, 
 // Returns CarField representation of struct field found 
-CarField* getCarField(CarHeader ch, char* providedField);
+CarField getCarField(char* providedField);
 
 char* getCarContent(Car* car, CarField field);
 
 char* getHeaderDescription(CarHeader* header, CarField field);
 
-// Returns true if a Car's field == searched value
-bool checkCarByField(Car* c, CarField field, char value[100]);
+CarSearchable CarSearchUsing(CarField field);
+
+bool checkIfCarMatches(Car* car, CarField field, CarSearchable search);
 
 #endif

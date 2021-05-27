@@ -22,7 +22,7 @@ int main(void) {
         printAllLines();
         break;
     case 5:
-        //printSelectedCars();
+        printSelectedCars();
         break;
     case 6:
         printSelectedLines();

@@ -61,3 +61,36 @@ void printAllCars()
     freeCar(car);
     fclose(bin);
 }
+
+void printSelectedCars()
+{
+    char binFileName[MAX_STRING_SIZE], fieldName[MAX_STRING_SIZE];
+    scanf("%s %s", binFileName, fieldName);
+
+    FILE* bin = fopen(binFileName, "rb");
+
+    CarHeader* header = newCarHeader();
+    getCarHeader(header, bin, BIN);
+    int nRegisters = getTotalNumberRegisters(bin);
+
+    // Checking which field to use, and which value to search for.
+    CarField field = getCarField(fieldName);
+    CarSearchable search = CarSearchUsing(field);
+    Car* car = newCar();
+
+    // Print lines that match our search.
+    while(nRegisters--) {
+        readCar(car, bin, BIN);
+        // Checking whether line matches, then printing it if it isn't logically removed
+        if (checkIfCarMatches(car, field, search))
+        {
+            printCar(car, header);
+            printf("\n");
+        }
+    }
+
+    // Freeing data that will not be used anymore
+    freeCarHeader(header);
+    freeCar(car);
+    fclose(bin);
+}
