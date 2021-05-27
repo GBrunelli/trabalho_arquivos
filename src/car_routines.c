@@ -41,8 +41,9 @@ void CarsCsvToBin()
 
 void printAllCars()
 {
-    // open the files
-    FILE* bin = fopen("tests/veiculo5.bin", "r"); // TEST
+    char binFileName[MAX_STRING_SIZE];
+    scanf("%s", binFileName);
+    FILE* bin = fopen(binFileName, "rb");
 
     int n = getTotalNumberRegisters(bin);
     Car* car = newCar();
