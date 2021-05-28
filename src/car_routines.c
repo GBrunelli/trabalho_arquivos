@@ -5,22 +5,35 @@ void CarsCsvToBin()
     char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
     scanf("%s %s", csvFileName, binFileName);
 
-    // open the binary file
+    // Open the csv, if an error occur prints "Falha no processamento do arquivo."
     FILE* csv = fopen(csvFileName, "r");
-    FILE* bin = fopen(binFileName, "wb+");
+    if (csv == NULL) 
+    {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
 
-    // read the header from the csv and write in the bin
+    // Creates the binary file, if an error occur prints "Falha no processamento do arquivo."
+    FILE* bin = fopen(binFileName, "wb+");
+    if (bin == NULL) 
+    {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
+
+    // Read the header from the csv and write in the bin
     CarHeader* carHeader = newCarHeader();
     getCarHeader(carHeader, csv, CSV);
     writeCarHeader(carHeader, bin, BIN);
 
-    // set the file status as inconsistent 
+    // Set the file status as inconsistent 
     setFileStatus(bin, STATUS_INCONSISTENT);
 
-    // instanciate a car holder
+    // Instanciate a car holder
     Car* car = newCar();
     Car* result;
 
+    // read the first car
     result = readCar(car, csv, CSV);
     while(result != NULL) // while there are cars in the csv
     {
@@ -28,10 +41,10 @@ void CarsCsvToBin()
         result = readCar(car, csv, CSV); // read the car from the csv
     }
 
-    // set the file status as consistent 
+    // Set the file status as consistent 
     setFileStatus(bin, STATUS_CONSISTENT);
 
-    // free the heap used in this funtion 
+    // Free the heap used in this funtion 
     fclose(bin);
     freeCarHeader(carHeader);
     freeCar(car);
@@ -44,18 +57,39 @@ void printAllCars()
     char binFileName[MAX_STRING_SIZE];
     scanf("%s", binFileName);
     FILE* bin = fopen(binFileName, "rb");
-
-    int n = getTotalNumberRegisters(bin);
-    Car* car = newCar();
+    if (bin == NULL) 
+    {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
 
     CarHeader* header = newCarHeader();
     getCarHeader(header, bin, BIN);
+    if(!checkCarFileIntegrity(header))
+    {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        freeLineHeader(header);
+        exit(0);
+    }
+
+    int nRegisters = getTotalNumberRegisters(bin);
+    // If there are no registers, stop the processing and return "Registro inexistente."
+    if (nRegisters == 0) {
+        printf("Registro inexistente.\n");
+        fclose(bin);
+        freeLineHeader(header);
+        exit(0);
+    }
     
-    for (int i = 0; i < n; i++)
+    Car* car = newCar();
+    while (nRegisters--)
     {
         readCar(car, bin, BIN);
         if(printCar(car, header))
+        {
             printf("\n");
+        }   
     }
 
     freeCarHeader(header);
@@ -65,14 +99,36 @@ void printAllCars()
 
 void printSelectedCars()
 {
+    // Read the input and open the file
     char binFileName[MAX_STRING_SIZE], fieldName[MAX_STRING_SIZE];
     scanf("%s %s", binFileName, fieldName);
-
     FILE* bin = fopen(binFileName, "rb");
+    if (bin == NULL) 
+    {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
 
+    // Checking file consistency
     CarHeader* header = newCarHeader();
     getCarHeader(header, bin, BIN);
+    if(!checkCarFileIntegrity(header))
+    {
+        printf("Falha no processamento do arquivo.\n");
+        fclose(bin);
+        freeLineHeader(header);
+        exit(0);
+    }
+
+    //If there are no registers, stop the processing and print "Registro inexistente."
     int nRegisters = getTotalNumberRegisters(bin);
+    if (nRegisters == 0) 
+    {
+        printf("Registro inexistente.\n");
+        fclose(bin);
+        freeLineHeader(header);
+        exit(0);
+    }
 
     // Checking which field to use, and which value to search for.
     CarField field = getCarField(fieldName);
@@ -80,6 +136,7 @@ void printSelectedCars()
     Car* car = newCar();
 
     // Print lines that match our search.
+    char match = 0;
     while(nRegisters--) {
         readCar(car, bin, BIN);
         // Checking whether line matches, then printing it if it isn't logically removed
@@ -87,8 +144,13 @@ void printSelectedCars()
         {
             printCar(car, header);
             printf("\n");
+            match = 1;
         }
     }
+
+    // Check whether matches were found
+    if (!match)
+        printf("Registro inexistente.\n");
 
     // Freeing data that will not be used anymore
     freeCarHeader(header);
@@ -105,6 +167,12 @@ void InsertNewCarsBin()
 
     // Opening both src and dest files
     FILE* bin = fopen(binFileName, "r+b");
+
+    // Error handling if file didn't open correctly
+    if (bin == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        exit(0);
+    }
 
     // Checking file integrity
     CarHeader* header = newCarHeader();
