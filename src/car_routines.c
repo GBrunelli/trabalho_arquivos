@@ -69,7 +69,7 @@ void printAllCars()
     {
         printf("Falha no processamento do arquivo.\n");
         fclose(bin);
-        freeLineHeader(header);
+        freeCarHeader(header);
         exit(0);
     }
 
@@ -78,7 +78,7 @@ void printAllCars()
     if (nRegisters == 0) {
         printf("Registro inexistente.\n");
         fclose(bin);
-        freeLineHeader(header);
+        freeCarHeader(header);
         exit(0);
     }
     
@@ -116,7 +116,7 @@ void printSelectedCars()
     {
         printf("Falha no processamento do arquivo.\n");
         fclose(bin);
-        freeLineHeader(header);
+        freeCarHeader(header);
         exit(0);
     }
 
@@ -126,7 +126,7 @@ void printSelectedCars()
     {
         printf("Registro inexistente.\n");
         fclose(bin);
-        freeLineHeader(header);
+        freeCarHeader(header);
         exit(0);
     }
 
