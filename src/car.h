@@ -23,7 +23,7 @@ typedef union _CarSearchable {
 // Gets the sum of active and removed register in the bin file
 int getTotalNumberRegisters(FILE* file);
 
-// Creates a new reusable CarHeader.
+// Alocates memory and initializes the struct CarHeader
 CarHeader* newCarHeader();
 
 // Get all Header information from a specific source file. 
@@ -33,11 +33,14 @@ CarHeader* getCarHeader(CarHeader* carHeader, FILE* file, Source from);
 // Set the status of a file as consistent '1' or inconsistent '0'
 void setFileStatus(FILE *file, char c);
 
+// Verify if the file is consistent. 
+// Returns 0 if it is inconsistent, or a value 
+// different than zero if it is consistent
 int checkCarFileIntegrity(CarHeader* header);
 
 /* ## Basic Car functions ## */
 
-// Creates a new reusable Car.
+// Alocates memory and initializes the struct Car
 Car* newCar();
 
 // Reads a car at the current file pointer from a source file. For bin files, if
@@ -47,18 +50,11 @@ Car* readCar(Car *c, FILE* file, Source From);
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 int printCar(Car* car, CarHeader* header);
 
-// Free all memory associated with a Car
+// Free all memory associated with a Car.
 void freeCar(Car* c);
 
-// Free all memory associated with a CarHeader
+// Free all memory associated with a CarHeader.
 void freeCarHeader(CarHeader* carHeader);
-
-/* ## Functions related to updating Cars from different sources. ## */
-
-// Updates a Car with data from a specific source. 
-// Currently supported sources: BIN, CLI, CSV
-// If updating from CLI, file should be NULL.
-void updateCar(Car* c, FILE* file, Source from);
 
 /* ## Functions related to writing Cars to different sources ## */
 
@@ -66,6 +62,8 @@ void updateCar(Car* c, FILE* file, Source from);
 // Currently only supports BIN files.
 void writeCar(Car* c, FILE* file, Source from);
 
+// Writes a CarHeader to a specific source
+// Currently only supports BIN files.
 void writeCarHeader(CarHeader* carHeader, FILE* file, Source from);
 
 /* ## Functions related to searching using a specific struct field ## */
@@ -74,12 +72,19 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from);
 // Returns CarField representation of struct field found 
 CarField getCarField(char* providedField);
 
+// Get a new string with value of the field of a Car.
+// The string must be freed by the user.
 char* getCarContent(Car* car, CarField field);
 
+// Get a new string with the field description of a determined field of a CarHeader.
+// The string must be freed by the user.
 char* getHeaderDescription(CarHeader* header, CarField field);
 
+// Returns a CarSearchable union given a CarField.
 CarSearchable CarSearchUsing(CarField field);
 
+// Check if the the car match the search.
+// Returns true if it is a match, false if it isn't.
 bool checkIfCarMatches(Car* car, CarField field, CarSearchable search);
 
 #endif

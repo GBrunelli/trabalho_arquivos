@@ -2,7 +2,7 @@
 #include "utils.h"
 
 #define STRUCT_CAR_HEADER_SIZE 175
-#define STRUCT_BASE_CAR_SIZE 31 // ! Não seria 32? Já que vai de 0...31
+#define STRUCT_BASE_CAR_SIZE 31
 
 struct _CarHeader {
     char status;
@@ -42,7 +42,7 @@ int getTotalNumberRegisters(FILE* file)
     return n;
 }
 
-// Alocates memory and initializes the struct
+// Alocates memory and initializes the struct CarHeader
 CarHeader* newCarHeader()
 {
     CarHeader* carHeader = calloc(1, sizeof(CarHeader));
@@ -51,11 +51,12 @@ CarHeader* newCarHeader()
 }
 
 // Generates a CarHeader from a valid binary file.
-// ! Não precisa retornar em nenhuma dessas funções
-// ! Passou como ponteiro ele já altera no próprio fread
 CarHeader* _getCarHeaderFromBin(CarHeader* carHeader, FILE* file)
 {
+    // Set the file pointer to the start of the file
     fseek(file, 0, SEEK_SET);
+
+    // Read the data
     fread(&carHeader->status,                   sizeof(carHeader->status),                  1, file);
     fread(&carHeader->byteProxReg,              sizeof(carHeader->byteProxReg),             1, file);
     fread(&carHeader->nroRegistros,             sizeof(carHeader->nroRegistros),            1, file);
@@ -161,6 +162,7 @@ void writeCarHeader(CarHeader* carHeader, FILE* file, Source from)
 // Set the status of a file as consistent '1' or inconsistent '0'
 void setFileStatus(FILE *file, char c)
 {
+    // if the char is valid
     if(c == REMOVED || c == NOT_REMOVED)
     {
         CarHeader* header = newCarHeader();
@@ -171,6 +173,9 @@ void setFileStatus(FILE *file, char c)
     }
 }
 
+// Verify if the file is consistent. 
+// Returns 0 if it is inconsistent, or a value 
+// different than zero if it is consistent
 int checkCarFileIntegrity(CarHeader* header)
 {
     if(header->status == STATUS_CONSISTENT)
@@ -180,7 +185,7 @@ int checkCarFileIntegrity(CarHeader* header)
 
 /* ## Basic Car functions ## */
 
-// Creates a new reusable Car.
+// Alocates memory and initializes the struct Car
 Car* newCar()
 {
     Car* car = malloc(sizeof(struct _Car));
@@ -189,6 +194,7 @@ Car* newCar()
     return car;
 }
 
+// Reads the next car at the current file pointer
 Car* _readCarFromCSV(Car *car, FILE *file)
 {
     if(car == NULL) return NULL;
@@ -199,6 +205,7 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     char *buffer_pointer = buffer; // save the initial pointer location to free later
     fscanf(file, "%[^\n]%*c", buffer);
 
+    // if the line is not null
     if(*buffer != 0)
     {
         // get each column
@@ -268,6 +275,7 @@ Car* _readCarFromCSV(Car *car, FILE *file)
     return car;
 }
 
+// Reads the next car at the current file pointer
 Car* _readCarFromBIN(Car *car, FILE *file)
 {
     // if the pointer is pointing at the header, set the pointer for the first car in the file
@@ -275,13 +283,16 @@ Car* _readCarFromBIN(Car *car, FILE *file)
     long long offset = position < STRUCT_CAR_HEADER_SIZE ? STRUCT_CAR_HEADER_SIZE : position;
     fseek(file, offset, SEEK_SET);
 
+    // reads the field "removido" and "tamanhoRegistro" to analyse if car is valid
     fread(&car->removido,            sizeof(car->removido),          1, file);
     fread(&car->tamanhoRegistro,     sizeof(car->tamanhoRegistro),   1, file);
+    // if the car is logically removed, point to the next car
     if(car->removido == REMOVED) 
     {
-        fseek(file, car->tamanhoRegistro, SEEK_CUR);
+        fseek(file, car->tamanhoRegistro, SEEK_CUR); 
         return NULL;
     }
+    // read the data
     fread(&car->prefixo,             sizeof(car->prefixo),           1, file);
     fread(&car->data,                sizeof(car->data),              1, file);
     fread(&car->quantidadeLugares,   sizeof(car->quantidadeLugares), 1, file);
@@ -293,6 +304,7 @@ Car* _readCarFromBIN(Car *car, FILE *file)
     return car;
 }
 
+// Reads the next car from the stantart input
 Car* _readCarFromCLI(Car *car)
 {
     // Initializing zeroed char arrays and then reading from stdinput
@@ -385,11 +397,12 @@ Car* readCar(Car* car, FILE* file, Source from)
     return NULL;
 }
 
+// Prints a single field from a Car
 void printField(CarHeader* header, Car* car, CarField field)
 {
-    char* fieldContent = getCarContent(car, field);
-    char* fieldName = getHeaderDescription(header, field);
-    printf("%s: %s\n", fieldName, fieldContent);
+    char* fieldContent = getCarContent(car, field); // get the value of the field
+    char* fieldName = getHeaderDescription(header, field); // get the description of the field
+    printf("%s: %s\n", fieldName, fieldContent); // prints the field
     free(fieldContent);
     free(fieldName);
 }
@@ -397,9 +410,11 @@ void printField(CarHeader* header, Car* car, CarField field)
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
 int printCar(Car* car, CarHeader* header)
 {
+    // verify id the car is removed
     if(car->removido == REMOVED) 
         return 0;
 
+    // print the fields required by the specification
     printField(header, car, PREFIXO);
     printField(header, car, MODELO);
     printField(header, car, CATEGORIA);
@@ -409,56 +424,21 @@ int printCar(Car* car, CarHeader* header)
     return 1;
 }
 
-// Free all memory associated with a Car
+// Free all memory associated with a Car.
 void freeCar(Car* c)
 {
     free(c);
 }
 
-// Free all memory associated with a CarHeader
+// Free all memory associated with a CarHeader.
 void freeCarHeader(CarHeader* carHeader)
 {
     free(carHeader);
 }
 
-
-
-
-/* ## Functions related to updating Cars from different sources. ## */
-
-// Update Car from BIN file using fromByte as offset.
-// If fromByte == CURRENT_POSITION. Ignore any offset and uses current position
-void _updateCarFromBin(Car* c, FILE* bin, int64_t fromByte)
-{
-
-}
-
-// Update Car from CSV File. Consumes current Car in file buffer
-void _updateCarFromCSVCar(Car* c, FILE* csv)
-{
-
-}
-
-// Update Car from Command Car. Consumes current stdin buffer
-void _updateCarFromCLI(Car* c)
-{
-
-}
-
-// Updates a Car with data from a specific source. 
-// Currently supported sources: BIN, CLI, CSV
-// If updating from CLI, file should be NULL.
-void updateCar(Car* c, FILE* file, Source from)
-{
-
-}
-
-
-
-
 /* ## Functions related to writing Cars to different sources ## */
 
-// Writes Car to end of binary file.
+// Writes a Car to end of binary file.
 void _writeCarToBin(Car* car, FILE* file)
 {
     // gets the information from the header and update it
@@ -478,13 +458,14 @@ void _writeCarToBin(Car* car, FILE* file)
         header->nroRegistrosRemovidos++;
     }
 
+    // writes the header with the updated information
     writeCarHeader(header, file, BIN);
     freeCarHeader(header);
     
     // set the file pointer to the correct position
     fseek(file, byteOffset, SEEK_SET);
 
-    // write the car in the file
+    // write the data in the file
     fwrite(&car->removido,           sizeof(car->removido),          1, file);
     fwrite(&car->tamanhoRegistro,    sizeof(car->tamanhoRegistro),   1, file);
     fwrite(&car->prefixo,            sizeof(car->prefixo),           1, file);
@@ -511,9 +492,6 @@ void writeCar(Car* car, FILE* file, Source from)
             break;
     }
 }
-
-
-
 
 /* ## Functions related to searching using a specific struct field ## */
 
@@ -548,6 +526,7 @@ CarField getCarField(char* providedField)
     return 0;
 }
 
+// Get the month member given its number
 void getMonthName(char* monthName, int month)
 {
     switch (month)
@@ -605,8 +584,11 @@ void getMonthName(char* monthName, int month)
     }
 }
 
+// Transform a date of format "YYYY-MM-DD" to "_DAY de _MONTH_NAME_ de _YEAR_".
+// Example: "2010-05-21" -> "21 de maio de 2021".
 void tranformDate(char* date)
 {
+    // verify iF the string is null
     if(*date == 0)
     {
         strcpy(date, NULL_MESSAGE);
@@ -618,36 +600,43 @@ void tranformDate(char* date)
     char* bufferPointer = buffer;
     strcpy(buffer, date);
     
+    // get the year
     char* token;
     token = strsep(&buffer, "-");
     sscanf(token, "%d", &year);
 
+    // get the month
     token = strsep(&buffer, "-");
     sscanf(token, "%d", &month);
 
+    // get the day
     token = strsep(&buffer, "-");
     sscanf(token, "%d", &day);
 
     free(bufferPointer);
 
+    // get the month name
     char monthName[15];
     getMonthName(monthName, month);
 
+    // create the new date format
     sprintf(date, "%02d de %s de %d", day, monthName, year);
     return;
 }
 
+// Get a new string with value of the field of a Car.
+// The string must be freed by the user.
 char* getCarContent(Car* car, CarField field)
 {
     char* string = calloc(1, MAX_STRING_SIZE);
     switch (field)
     {
     case PREFIXO:
-        strncpy(string, car->prefixo, sizeof(car->prefixo));
+        strncpy(string, car->prefixo,   sizeof(car->prefixo));
         break;
 
     case DATA:
-        strncpy(string, car->data, sizeof(car->data));
+        strncpy(string, car->data,      sizeof(car->data));
         tranformDate(string);
         break;
     
@@ -660,7 +649,7 @@ char* getCarContent(Car* car, CarField field)
         break;
 
     case MODELO:
-        strncpy(string, car->modelo, car->tamanhoModelo);
+        strncpy(string, car->modelo,    car->tamanhoModelo);
         break;
 
     case CATEGORIA:
@@ -678,33 +667,35 @@ char* getCarContent(Car* car, CarField field)
     return string;
 }
 
+// Get a new string with the field description of a determined field of a CarHeader.
+// The string must be freed by the user.
 char* getHeaderDescription(CarHeader* header, CarField field)
 {
     char* string = calloc(1, MAX_STRING_SIZE);
     switch (field)
     {
     case PREFIXO:
-        strncpy(string, header->descrevePrefixo, sizeof(header->descrevePrefixo));
+        strncpy(string, header->descrevePrefixo,    sizeof(header->descrevePrefixo));
         break;
 
     case DATA:
-        strncpy(string, header->descreveData, sizeof(header->descreveData));
+        strncpy(string, header->descreveData,       sizeof(header->descreveData));
         break;
     
     case QTD_LUGARES:
-        strncpy(string, header->descreveLugares, sizeof(header->descreveLugares));
+        strncpy(string, header->descreveLugares,    sizeof(header->descreveLugares));
         break;
    
     case COD_LINHA_CAR:
-        strncpy(string, header->descreveLinha, sizeof(header->descreveLinha));
+        strncpy(string, header->descreveLinha,      sizeof(header->descreveLinha));
         break;
 
     case MODELO:
-        strncpy(string, header->descreveModelo, sizeof(header->descreveModelo));
+        strncpy(string, header->descreveModelo,     sizeof(header->descreveModelo));
         break;
 
     case CATEGORIA:
-        strncpy(string, header->descreveCategoria, sizeof(header->descreveCategoria));
+        strncpy(string, header->descreveCategoria,  sizeof(header->descreveCategoria));
         break;
     
     default:
@@ -718,6 +709,7 @@ char* getHeaderDescription(CarHeader* header, CarField field)
     return string;
 }
 
+// Returns a CarSearchable union given a CarField.
 CarSearchable CarSearchUsing(CarField field)
 {
     char tmp[MAX_STRING_SIZE];
@@ -753,6 +745,8 @@ CarSearchable CarSearchUsing(CarField field)
     return cs;
 }
 
+// Check if the the car match the search.
+// Returns true if it is a match, false if it isn't.
 bool checkIfCarMatches(Car* car, CarField field, CarSearchable search)
 {
     switch (field)
@@ -778,4 +772,3 @@ bool checkIfCarMatches(Car* car, CarField field, CarSearchable search)
 
     return UNKNOWN_ERR;
 }
-

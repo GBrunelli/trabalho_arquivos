@@ -1,5 +1,6 @@
 #include "car.h"
 
+// 1th task -> INSERT ALL
 void CarsCsvToBin()
 {
     char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
@@ -52,6 +53,7 @@ void CarsCsvToBin()
     binarioNaTela(binFileName);
 }
 
+// 3nd task -> SELECT ALL
 void printAllCars()
 {
     char binFileName[MAX_STRING_SIZE];
@@ -97,6 +99,7 @@ void printAllCars()
     fclose(bin);
 }
 
+// 5rd task -> SELECT WHERE Campo = Valor
 void printSelectedCars()
 {
     // Read the input and open the file
@@ -158,6 +161,7 @@ void printSelectedCars()
     fclose(bin);
 }
 
+// 7th task -> INSERT N REGISTERS INTO END
 void InsertNewCarsBin()
 {
     // Getting stdin data for number of new registers and filename
