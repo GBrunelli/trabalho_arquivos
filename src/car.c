@@ -758,19 +758,19 @@ bool checkIfCarMatches(Car* car, CarField field, CarSearchable search)
     switch (field)
     {
     case PREFIXO:
-        return !strcmp(car->prefixo, search.prefixo);
+        return !strncmp(car->prefixo, search.prefixo, sizeof(car->prefixo));
 
     case DATA:
-        return !strcmp(car->data, search.data);
+        return !strncmp(car->data, search.data, sizeof(car->data));
     
     case QTD_LUGARES:
         return car->quantidadeLugares == search.quantidadeLugares;
 
     case MODELO:
-        return !strcmp(car->modelo, search.modelo);
+        return !strncmp(car->modelo, search.modelo, sizeof(car->modelo));
 
     case CATEGORIA:
-        return !strcmp(car->categoria, search.categoria);
+        return !strncmp(car->categoria, search.categoria, sizeof(car->categoria));
     
     default:
         break;
