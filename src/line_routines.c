@@ -143,10 +143,10 @@ void printSelectedLines(void) {
     LineField field = checkField(fieldName);
     LineSearchable search = searchUsing(field);
     Line* l = newLine();
-    int n_matches = 0; // Number of matches
-    FuncStatus status = OK; // Used to check whether a line is removed or not
 
     // Print lines that match our search.
+    int n_matches = 0; // Number of matches
+    FuncStatus status = OK; // Used to check whether a line is removed or not
     while(nRegisters--) {
         if (updateLine(l, bin, BIN) != OK) {
             printf("Falha no processamento do arquivo.\n");

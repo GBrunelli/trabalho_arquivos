@@ -22,9 +22,6 @@
 // Possible file sources.
 typedef enum _Source { CSV, CLI, BIN } Source;
 
-// Possible types of data
-typedef enum _DataType { CAR, LINE } DataType;
-
 // Possible results from functions.
 // Can be: Errors, Incomplete Results, OK, etc...
 typedef enum _FuncStatus { UNKNOWN_ERR, OK, EOF_OR_MALFORMED, NO_FILE_FOUND, LOGICALLY_REMOVED } FuncStatus;
