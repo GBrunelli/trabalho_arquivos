@@ -4,12 +4,11 @@
 #include "project.h"
 #include "utils.h"
 
+// Enum of all searchable struct fields inside a Car
 typedef enum _CarField { PREFIXO, DATA, QTD_LUGARES, COD_LINHA_CAR, MODELO, CATEGORIA } CarField;
 
-typedef struct _CarHeader CarHeader;
-
-typedef struct _Car Car;
-
+// Union used in conjunction with CarField. Is used to search inside a struct, 
+// but without compile-time knowledge of which field to use
 typedef union _CarSearchable {
     char prefixo[5];
     char data[10];
@@ -17,6 +16,11 @@ typedef union _CarSearchable {
     char modelo[MAX_STRING_SIZE];
     char categoria[MAX_STRING_SIZE];
 } CarSearchable;
+
+typedef struct _CarHeader CarHeader;
+
+typedef struct _Car Car;
+
 
 /* ## Functions to deal with Car headers ## */
 

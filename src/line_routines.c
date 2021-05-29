@@ -1,6 +1,7 @@
 #include "line_routines.h"
 #include "line.h"
 
+// 2th task -> INSERT ALL
 void LinesCsvToBin(void) {
     // Getting CSV and BIN filenames
     char csvFileName[MAX_STRING_SIZE], binFileName[MAX_STRING_SIZE];
@@ -46,6 +47,7 @@ void LinesCsvToBin(void) {
     binarioNaTela(binFileName);
 }
 
+// 4th task -> SELECT ALL
 void printAllLines(void) {
     // Getting filename from stdin
     char binFileName[MAX_STRING_SIZE];
@@ -101,7 +103,9 @@ void printAllLines(void) {
     fclose(bin);
 }
 
+// 6th task -> SELECT WHERE Campo = Valor
 void printSelectedLines(void) {
+    // Scanning from stdin, then opening files
     char binFileName[MAX_STRING_SIZE], fieldName[MAX_STRING_SIZE];
     scanf("%s %s", binFileName, fieldName);
 
@@ -170,6 +174,7 @@ void printSelectedLines(void) {
     fclose(bin);
 }
 
+// 8th task -> INSERT N REGISTERS INTO END
 void InsertNewLinesBin(void) {
     // Getting stdin data for number of new registers and filename
     int nRegisters = 0;

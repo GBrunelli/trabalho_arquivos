@@ -1,13 +1,17 @@
 #include "line.h"
 #include "utils.h"
 
+// Offset to pass through header
 #define LINE_HEADER_OFFSET 82
+// Base offset for each line
 #define LINE_OFFSET 13
 
+// Pre-determined size of each header string
 #define DESCREVECODIGO_SIZE 15
 #define DESCREVECARTAO_SIZE 13
 #define DESCREVENOME_SIZE 13
 #define DESCREVECOR_SIZE 24
+
 struct _Line {
     int8_t removido;
     int32_t tamanhoRegistro;
@@ -47,6 +51,7 @@ LineHeader* newLineHeader()
     return lh;
 }
 
+// Updates a LineHeader using a valid binary file. 
 void _updateLineHeaderFromBin(LineHeader* lh, FILE* file) {
     fseek(file, 0, SEEK_SET);
 
@@ -60,6 +65,8 @@ void _updateLineHeaderFromBin(LineHeader* lh, FILE* file) {
     fread(&lh->descreveCor, DESCREVECOR_SIZE, 1, file);
 }
 
+// Updates a LineHeader using a valid CSV file. 
+// Must be first command used on CSV FILE or will not work.
 void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file) {
     // set the pointer to the start of the file
     fseek(file, 0, SEEK_SET);
@@ -147,7 +154,6 @@ void overwriteLineHeader(LineHeader* lh, FILE* file, Source source) {
     }
 }
 
-// Set the status of a file as consistent '1' or inconsistent '0'
 void setLineFileStatus(FILE *file, char c)
 {
     if(c == REMOVED || c == NOT_REMOVED)
@@ -161,6 +167,7 @@ void setLineFileStatus(FILE *file, char c)
 }
 
 /* ## Basic Line functions ## */
+
 Line* newLine() {
     Line* l = calloc(1, sizeof(Line));
     l->removido = '1';
@@ -168,6 +175,7 @@ Line* newLine() {
     return l;
 }
 
+// Update Line from CSV File. Consumes current line in file buffer
 FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
     if (l == NULL) return UNKNOWN_ERR;
     if (file == NULL) return UNKNOWN_ERR;
@@ -208,6 +216,7 @@ FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
     return OK;
 };
 
+// Update Line from BIN file, uses current offset by default
 FuncStatus _updateLineFromBin(Line* l, FILE* file) {
     if (l == NULL) return UNKNOWN_ERR;
     if (file == NULL) return UNKNOWN_ERR;
@@ -232,6 +241,7 @@ FuncStatus _updateLineFromBin(Line* l, FILE* file) {
     return OK;
 }
 
+// Update Line from the Command Line (stdin). Consumes current stdin buffer
 FuncStatus _updateLineFromCLI(Line* l) {
     // Initializing zeroed char arrays and then reading from stdinput
     char codLinha[5] = {0};
@@ -284,6 +294,7 @@ FuncStatus updateLine(Line* l, FILE* file, Source from) {
     return UNKNOWN_ERR;
 }
 
+// Writes Line to end of binary file.
 FuncStatus _writeLineToBin(Line* l, FILE* file) {
     // gets the information from the header and update it
     LineHeader* lh = newLineHeader();
@@ -327,6 +338,7 @@ FuncStatus writeLine(Line* l, FILE* file, Source from) {
     return UNKNOWN_ERR;
 }
 
+// Matches each cardType with its text counterpart
 char* _checkCardType(char cardType) {
     switch (cardType) {
     case 'S':

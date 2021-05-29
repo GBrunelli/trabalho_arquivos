@@ -4,11 +4,11 @@
 #include "project.h"
 #include "utils.h"
 
-// Use current file position instead of a specific offset.
-#define CURRENT_POSITION -11
-
+// Enum of all searchable struct fields inside a line
 typedef enum _LineField { COD_LINHA, ACEITA_CARTAO, NOME_LINHA, COR_LINHA } LineField;
 
+// Union used in conjunction with LineField. Is used to search inside a struct, 
+// but without compile-time knowledge of which field to use
 typedef union _LineSearchable {
     int32_t codLinha;
     char aceitaCartao;
@@ -30,24 +30,22 @@ LineHeader* newLineHeader();
 // Currently supported sources: BIN, CSV
 void updateLineHeader(LineHeader* lh, FILE* file, Source from);
 
-// Generates a LineHeader from a valid binary file. 
-void _updateLineHeaderFromBin(LineHeader* lh, FILE* file);
-
-// Generates a LineHeader from a valid CSV file. 
-// Must be first command used on CSV File or will not work.
-void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file);
-
 // Check whether LineHeader status is '1' or '0'
 bool checkFileIntegrity(LineHeader* lh);
 
 // Overwrite old LineHeader from file with a newer, currently in-memory one.
 void overwriteLineHeader(LineHeader* lh, FILE* file, Source source);
 
+// Returns how many non logically removed registers there are.
 int getNRegisters(LineHeader* lh);
+
+// Returns how many logically removed registers there are
 int getNRemovedRegisters(LineHeader* lh);
 
+// Free all data associated with a line register
 void freeLineHeader(LineHeader* lh);
 
+// Set a binary line file as INCONSISTENT or CONSISTENT, depending on supplied C
 void setLineFileStatus(FILE *file, char c);
 
 /* ## Basic line functions ## */
@@ -55,44 +53,31 @@ void setLineFileStatus(FILE *file, char c);
 // Creates a new reusable Line.
 Line* newLine();
 
-// Prints Line. Checks if Line is logically removed and also deals with nulls.
-FuncStatus printLine(Line* l, LineHeader* lh);
-
 // Free all memory associated with a line
 void freeLine(Line* l);
 
-/* ## Functions related to updating lines from different sources. ## */
+// Prints Line. Also checks if Line is logically removed and deals with nulls.
+FuncStatus printLine(Line* l, LineHeader* lh);
+
 
 // Updates a Line with data from a specific source. 
 // Currently supported sources: BIN, CLI, CSV
 // If updating from CLI, file should be NULL.
 FuncStatus updateLine(Line* l, FILE* file, Source from);
 
-// Update Line from BIN file using fromByte as offset.
-// If fromByte == CURRENT_POSITION. Ignore any offset and uses current position
-FuncStatus _updateLineFromBin(Line* l, FILE* bin);
-
-// Update Line from CSV File. Consumes current line in file buffer
-FuncStatus _updateLineFromCSVLine(Line* l, FILE* csv);
-
-// Update Line from Command Line. Consumes current stdin buffer
-FuncStatus _updateLineFromCLI(Line* l);
-
-/* ## Functions related to writing lines to different sources ## */
-
 // Writes a Line to a specific source
 // Currently only supports BIN files.
 FuncStatus writeLine(Line* l, FILE* file, Source from);
 
-// Writes Line to end of binary file.
-FuncStatus _writeLineToBin(Line* l, FILE* bin);
-
 /* ## Functions related to searching using a specific struct field ## */
 
+// Check which field should we use to search
 LineField checkField(char* str) ;
 
+// Based on correct field, treats stding searchable value and puts it on correct union field
 LineSearchable searchUsing(LineField lf);
 
+// Based on a specific field and a specific searched value, check whether the current line matches 
 bool checkIfLineMatches(Line* l, LineField field, LineSearchable search);
 
 #endif

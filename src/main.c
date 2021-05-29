@@ -3,11 +3,11 @@
 #include "car_routines.h"
 
 int main(void) {
-    // Routine to be executed
+    // Checking which routine should we execute
     int n_routine = 0;
     scanf("%d", &n_routine);
     
-
+    // Switching for correct routine
     switch (n_routine) {
     case 1:
         CarsCsvToBin();
