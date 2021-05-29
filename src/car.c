@@ -715,7 +715,7 @@ CarSearchable CarSearchUsing(CarField field)
     char tmp[MAX_STRING_SIZE];
     scan_quote_string(tmp);
 
-    CarSearchable cs;
+    CarSearchable cs = (CarSearchable) 0;
     switch (field)
     {
     case PREFIXO:
