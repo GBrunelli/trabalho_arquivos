@@ -12,7 +12,8 @@
 #define DESCREVENOME_SIZE 13
 #define DESCREVECOR_SIZE 24
 
-struct _Line {
+struct _Line
+{
     int8_t removido;
     int32_t tamanhoRegistro;
     int32_t codLinha;
@@ -23,7 +24,8 @@ struct _Line {
     char nomeCor[MAX_STRING_SIZE];
 };
 
-struct _LineHeader {
+struct _LineHeader
+{
     int8_t status;
     int64_t byteProxReg;
     int32_t nroRegistros;
@@ -34,10 +36,9 @@ struct _LineHeader {
     char descreveCor[DESCREVECOR_SIZE + 1];
 };
 
-
-LineHeader* newLineHeader()
+LineHeader *newLineHeader()
 {
-    LineHeader* lh = calloc(1, sizeof(LineHeader));
+    LineHeader *lh = calloc(1, sizeof(LineHeader));
     lh->status = '0';
     lh->nroRegistros = 0;
     lh->nroRegistrosRemovidos = 0;
@@ -47,12 +48,13 @@ LineHeader* newLineHeader()
     lh->descreveCartao[DESCREVECARTAO_SIZE] = '\0';
     lh->descreveNome[DESCREVENOME_SIZE] = '\0';
     lh->descreveCor[DESCREVECOR_SIZE] = '\0';
-    
+
     return lh;
 }
 
-// Updates a LineHeader using a valid binary file. 
-void _updateLineHeaderFromBin(LineHeader* lh, FILE* file) {
+// Updates a LineHeader using a valid binary file.
+void _updateLineHeaderFromBin(LineHeader *lh, FILE *file)
+{
     fseek(file, 0, SEEK_SET);
 
     fread(&lh->status, sizeof(lh->status), 1, file);
@@ -65,9 +67,10 @@ void _updateLineHeaderFromBin(LineHeader* lh, FILE* file) {
     fread(&lh->descreveCor, DESCREVECOR_SIZE, 1, file);
 }
 
-// Updates a LineHeader using a valid CSV file. 
+// Updates a LineHeader using a valid CSV file.
 // Must be first command used on CSV FILE or will not work.
-void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file) {
+void _updateLineHeaderFromCSV(LineHeader *lh, FILE *file)
+{
     // set the pointer to the start of the file
     fseek(file, 0, SEEK_SET);
 
@@ -77,7 +80,7 @@ void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file) {
     fscanf(file, "%[^\n]%*c", buffer);
 
     // get each column
-    char* token = strsep(&buffer, ",");
+    char *token = strsep(&buffer, ",");
     strncpy(lh->descreveCodigo, token, DESCREVECODIGO_SIZE);
 
     token = strsep(&buffer, ",");
@@ -92,30 +95,33 @@ void _updateLineHeaderFromCSV(LineHeader* lh, FILE* file) {
     free(buffer_pointer);
 }
 
-void updateLineHeader(LineHeader* LineHeader, FILE* file, Source from)
+void updateLineHeader(LineHeader *LineHeader, FILE *file, Source from)
 {
     switch (from)
     {
-        case CSV:
-            _updateLineHeaderFromCSV(LineHeader, file);
-            break;
-        case BIN:
-            _updateLineHeaderFromBin(LineHeader, file);
-            break;
-        default:
-            break;
+    case CSV:
+        _updateLineHeaderFromCSV(LineHeader, file);
+        break;
+    case BIN:
+        _updateLineHeaderFromBin(LineHeader, file);
+        break;
+    default:
+        break;
     }
 }
 
-int getNRegisters(LineHeader* lh) {
+int getNRegisters(LineHeader *lh)
+{
     return lh->nroRegistros;
 }
 
-int getNRemovedRegisters(LineHeader* lh) {
+int getNRemovedRegisters(LineHeader *lh)
+{
     return lh->nroRegistrosRemovidos;
 }
 
-bool checkFileIntegrity(LineHeader* lh) {
+bool checkFileIntegrity(LineHeader *lh)
+{
     switch (lh->status)
     {
     case '1':
@@ -125,7 +131,7 @@ bool checkFileIntegrity(LineHeader* lh) {
     }
 }
 
-void _overwriteLineHeaderToBin(LineHeader* lh, FILE* file)
+void _overwriteLineHeaderToBin(LineHeader *lh, FILE *file)
 {
     // set the file pointer to the correct position
     fseek(file, 0, SEEK_SET);
@@ -141,8 +147,8 @@ void _overwriteLineHeaderToBin(LineHeader* lh, FILE* file)
     fwrite(&lh->descreveCor, DESCREVECOR_SIZE, 1, file);
 }
 
-
-void overwriteLineHeader(LineHeader* lh, FILE* file, Source source) {
+void overwriteLineHeader(LineHeader *lh, FILE *file, Source source)
+{
     switch (source)
     {
     case BIN:
@@ -156,9 +162,9 @@ void overwriteLineHeader(LineHeader* lh, FILE* file, Source source) {
 
 void setLineFileStatus(FILE *file, char c)
 {
-    if(c == REMOVED || c == NOT_REMOVED)
+    if (c == REMOVED || c == NOT_REMOVED)
     {
-        LineHeader* lh = newLineHeader();
+        LineHeader *lh = newLineHeader();
         updateLineHeader(lh, file, BIN);
         lh->status = c;
         overwriteLineHeader(lh, file, BIN);
@@ -168,32 +174,39 @@ void setLineFileStatus(FILE *file, char c)
 
 /* ## Basic Line functions ## */
 
-Line* newLine() {
-    Line* l = calloc(1, sizeof(Line));
+Line *newLine()
+{
+    Line *l = calloc(1, sizeof(Line));
     l->removido = '1';
     l->tamanhoRegistro = LINE_OFFSET;
     return l;
 }
 
 // Update Line from CSV File. Consumes current line in file buffer
-FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
-    if (l == NULL) return UNKNOWN_ERR;
-    if (file == NULL) return UNKNOWN_ERR;
+FuncStatus _updateLineFromCSVLine(Line *l, FILE *file)
+{
+    if (l == NULL)
+        return UNKNOWN_ERR;
+    if (file == NULL)
+        return UNKNOWN_ERR;
 
     // Reading the line
     char codLinha[5] = {0};
     char aceitaCartao[2] = {0};
     char nomeLinha[MAX_STRING_SIZE] = {0};
     char corLinha[MAX_STRING_SIZE] = {0};
-    
+
     if (fscanf(file, "%[^,],%[^,],%[^,],%[^\n]%*c", codLinha, aceitaCartao, nomeLinha, corLinha) != 4)
         return EOF_OR_MALFORMED;
 
     // Logically removed Lines start with *. Checking whether current line is logically removed.
-    if (codLinha[0] == '*') {
+    if (codLinha[0] == '*')
+    {
         l->removido = REMOVED;
         l->codLinha = atoi(&codLinha[1]);
-    } else {
+    }
+    else
+    {
         l->removido = NOT_REMOVED;
         l->codLinha = atoi(codLinha);
     }
@@ -206,7 +219,7 @@ FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
         nomeLinha[0] = '\0';
     if (isNULO(corLinha))
         corLinha[0] = '\0';
-    
+
     l->tamanhoNome = strlen(nomeLinha);
     l->tamanhoCor = strlen(corLinha);
     l->tamanhoRegistro = LINE_OFFSET + l->tamanhoCor + l->tamanhoNome;
@@ -217,9 +230,12 @@ FuncStatus _updateLineFromCSVLine(Line* l, FILE* file) {
 };
 
 // Update Line from BIN file, uses current offset by default
-FuncStatus _updateLineFromBin(Line* l, FILE* file) {
-    if (l == NULL) return UNKNOWN_ERR;
-    if (file == NULL) return UNKNOWN_ERR;
+FuncStatus _updateLineFromBin(Line *l, FILE *file)
+{
+    if (l == NULL)
+        return UNKNOWN_ERR;
+    if (file == NULL)
+        return UNKNOWN_ERR;
 
     // if the pointer is pointing at the header, set the pointer for the first car in the file
     long long position = ftell(file);
@@ -242,7 +258,8 @@ FuncStatus _updateLineFromBin(Line* l, FILE* file) {
 }
 
 // Update Line from the Command Line (stdin). Consumes current stdin buffer
-FuncStatus _updateLineFromCLI(Line* l) {
+FuncStatus _updateLineFromCLI(Line *l)
+{
     // Initializing zeroed char arrays and then reading from stdinput
     char codLinha[5] = {0};
     char aceitaCartao[5] = {0};
@@ -256,19 +273,24 @@ FuncStatus _updateLineFromCLI(Line* l) {
     scan_quote_string(corLinha);
 
     // Checking whether the Line should be considered logically removed
-    if (codLinha[0] == '*') {
+    if (codLinha[0] == '*')
+    {
         l->removido = REMOVED;
         l->codLinha = atoi(&codLinha[1]);
-    } else {
+    }
+    else
+    {
         l->removido = NOT_REMOVED;
         l->codLinha = atoi(codLinha);
     }
 
     // Checking whether nomeLinha and corLinha are identified as NULO
-    if (isNULO(nomeLinha)) {
-        nomeLinha[0] = '\0';    
+    if (isNULO(nomeLinha))
+    {
+        nomeLinha[0] = '\0';
     }
-    if (isNULO(corLinha)) {
+    if (isNULO(corLinha))
+    {
         corLinha[0] = '\0';
     }
 
@@ -282,8 +304,10 @@ FuncStatus _updateLineFromCLI(Line* l) {
     return OK;
 }
 
-FuncStatus updateLine(Line* l, FILE* file, Source from) {
-    switch (from) {
+FuncStatus updateLine(Line *l, FILE *file, Source from)
+{
+    switch (from)
+    {
     case CSV:
         return _updateLineFromCSVLine(l, file);
     case BIN:
@@ -295,9 +319,10 @@ FuncStatus updateLine(Line* l, FILE* file, Source from) {
 }
 
 // Writes Line to end of binary file.
-FuncStatus _writeLineToBin(Line* l, FILE* file) {
+FuncStatus _writeLineToBin(Line *l, FILE *file)
+{
     // gets the information from the header and update it
-    LineHeader* lh = newLineHeader();
+    LineHeader *lh = newLineHeader();
     updateLineHeader(lh, file, BIN);
 
     int byteOffset = lh->byteProxReg;
@@ -324,13 +349,14 @@ FuncStatus _writeLineToBin(Line* l, FILE* file) {
     return OK;
 }
 
-FuncStatus writeLine(Line* l, FILE* file, Source from) {
+FuncStatus writeLine(Line *l, FILE *file, Source from)
+{
     switch (from)
     {
     case BIN:
         return _writeLineToBin(l, file);
         break;
-    
+
     default:
         break;
     }
@@ -339,8 +365,10 @@ FuncStatus writeLine(Line* l, FILE* file, Source from) {
 }
 
 // Matches each cardType with its text counterpart
-char* _checkCardType(char cardType) {
-    switch (cardType) {
+char *_checkCardType(char cardType)
+{
+    switch (cardType)
+    {
     case 'S':
         return "PAGAMENTO SOMENTE COM CARTAO SEM PRESENCA DE COBRADOR";
     case 'N':
@@ -353,8 +381,9 @@ char* _checkCardType(char cardType) {
     }
 }
 // Prints Car. Checks if Car is logically removed and also deals with nulls.
-FuncStatus printLine(Line* l, LineHeader* lh) {
-    if(l->removido == REMOVED) 
+FuncStatus printLine(Line *l, LineHeader *lh)
+{
+    if (l->removido == REMOVED)
         return LOGICALLY_REMOVED;
 
     printf("%s: %d\n", lh->descreveCodigo, l->codLinha);
@@ -364,7 +393,8 @@ FuncStatus printLine(Line* l, LineHeader* lh) {
     return OK;
 }
 
-LineField checkField(char* str) {
+LineField checkField(char *str)
+{
     if (strcmp(str, "codLinha") == 0)
         return COD_LINHA;
     if (strcmp(str, "aceitaCartao") == 0)
@@ -375,12 +405,14 @@ LineField checkField(char* str) {
     return COR_LINHA;
 }
 
-LineSearchable searchUsing(LineField lf) {
+LineSearchable searchUsing(LineField lf)
+{
     char tmp[100];
     scan_quote_string(tmp);
 
     LineSearchable s;
-    switch (lf) {
+    switch (lf)
+    {
     case COD_LINHA:
         s.codLinha = atoi(tmp);
         break;
@@ -394,11 +426,12 @@ LineSearchable searchUsing(LineField lf) {
         strcpy(s.corLinha, tmp);
         break;
     }
-    
+
     return s;
 }
 
-bool checkIfLineMatches(Line* l, LineField lf, LineSearchable search) {
+bool checkIfLineMatches(Line *l, LineField lf, LineSearchable search)
+{
     switch (lf)
     {
     case COD_LINHA:
@@ -413,12 +446,12 @@ bool checkIfLineMatches(Line* l, LineField lf, LineSearchable search) {
     return UNKNOWN_ERR;
 }
 
-
-void freeLine(Line* l) {
+void freeLine(Line *l)
+{
     free(l);
 }
 
-void freeLineHeader(LineHeader* lh) {
+void freeLineHeader(LineHeader *lh)
+{
     free(lh);
 }
-

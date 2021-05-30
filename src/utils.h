@@ -20,11 +20,23 @@
 #define STATUS_CONSISTENT '1'
 
 // Possible file sources.
-typedef enum _Source { CSV, CLI, BIN } Source;
+typedef enum _Source
+{
+    CSV,
+    CLI,
+    BIN
+} Source;
 
 // Possible results from functions.
 // Can be: Errors, Incomplete Results, OK, etc...
-typedef enum _FuncStatus { UNKNOWN_ERR, OK, EOF_OR_MALFORMED, NO_FILE_FOUND, LOGICALLY_REMOVED } FuncStatus;
+typedef enum _FuncStatus
+{
+    UNKNOWN_ERR,
+    OK,
+    EOF_OR_MALFORMED,
+    NO_FILE_FOUND,
+    LOGICALLY_REMOVED
+} FuncStatus;
 
 // ## Utility functions ## //
 
@@ -32,13 +44,13 @@ typedef enum _FuncStatus { UNKNOWN_ERR, OK, EOF_OR_MALFORMED, NO_FILE_FOUND, LOG
 void leftShift(char *string, int len);
 
 // Check if string equals "NULO"
-int isNULO(char* string);
+int isNULO(char *string);
 
 // Format garbage filled string using "\0@@@@" format
-void fillWithGarbage(char* string, int len);
+void fillWithGarbage(char *string, int len);
 
-// Remove "Quotation Marks" from a string. 
-void removeQuotations(char* str);
+// Remove "Quotation Marks" from a string.
+void removeQuotations(char *str);
 
 // ## Supplied functions on funcao_fornecida.c ## //
 

@@ -2,13 +2,15 @@
 #include "line_routines.h"
 #include "car_routines.h"
 
-int main(void) {
+int main(void)
+{
     // Checking which routine should we execute
     int n_routine = 0;
     scanf("%d", &n_routine);
-    
+
     // Switching for correct routine
-    switch (n_routine) {
+    switch (n_routine)
+    {
     case 1:
         CarsCsvToBin();
         break;
